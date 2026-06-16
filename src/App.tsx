@@ -177,7 +177,7 @@ function App() {
             <section className="min-w-0 overflow-y-auto bg-canvas px-20 py-12 xl:px-24 xl:py-14">
               <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-xl font-semibold tracking-tight">
+                  <h1 className="text-[22px] font-semibold tracking-tight">
                     Sales, cancellation &amp; re-let metrics
                   </h1>
                   <p className="mt-1 text-sm text-muted-foreground">
