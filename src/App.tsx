@@ -217,43 +217,43 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <>
-                  <div id="section-bookings" className="scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                <div className="divide-y divide-border">
+                  <div id="section-bookings" className="scroll-mt-6 py-8">
                     <BookingsSnapshot filters={activeFilters} />
                   </div>
 
-                  <div id="section-abv" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-abv" className="scroll-mt-6 py-8">
                     <AverageBookingValueSnapshot filters={activeFilters} />
                   </div>
 
-                  <div id="section-cal" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-cal" className="scroll-mt-6 py-8">
                     <CalFinancials filters={activeFilters} />
                   </div>
 
-                  <div id="section-timing" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-timing" className="scroll-mt-6 py-8">
                     <TimingSnapshot filters={activeFilters} />
                   </div>
 
-                  <div id="section-bookings-vs-stays" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-bookings-vs-stays" className="scroll-mt-6 py-8">
                     <BookingsVsStaysChart filters={activeFilters} />
                   </div>
 
-                  <div id="section-abv-per-day" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-abv-per-day" className="scroll-mt-6 py-8">
                     <AbvPerDayChart filters={activeFilters} />
                   </div>
 
-                  <div id="section-lead-time" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-lead-time" className="scroll-mt-6 py-8">
                     <LeadTimeChart filters={activeFilters} />
                   </div>
 
-                  <div id="section-bookings-per-day" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-bookings-per-day" className="scroll-mt-6 py-8">
                     <BookingsMadePerDayChart filters={activeFilters} />
                   </div>
 
-                  <div id="section-cal-ddl-takeup" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
+                  <div id="section-cal-ddl-takeup" className="scroll-mt-6 py-8">
                     <CalDdlTakeupChart filters={activeFilters} />
                   </div>
-                </>
+                </div>
               )}
 
             </section>
