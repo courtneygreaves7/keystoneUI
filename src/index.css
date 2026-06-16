@@ -31,6 +31,7 @@
   --ring: var(--brand-pink);
   --popover: #ffffff;
   --popover-foreground: var(--brand-dark-blue);
+  --destructive: #dc2626;
 
   /* Ambient gradients */
   --gradient-from: #f1f6fb;
@@ -62,6 +63,7 @@
   --ring: var(--brand-pink);
   --popover: #243748;
   --popover-foreground: var(--brand-light-blue);
+  --destructive: #f87171;
 
   --gradient-from: #141f29;
   --gradient-mid: #243748;
@@ -90,6 +92,7 @@
   --color-ring: var(--ring);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
   --color-canvas: var(--canvas);
   --color-brand: var(--brand-pink);
 }

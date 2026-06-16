@@ -8,12 +8,14 @@ import {
   Download,
   KeyRound,
   LayoutDashboard,
+  LogOut,
   MoonStar,
   ShieldCheck,
   Sun,
 } from "lucide-react"
 
 import { FilterSidebar } from "@/components/filter-sidebar"
+import { LoginPage } from "@/components/login-page"
 import { SectionNav } from "@/components/section-nav"
 import { AverageBookingValueSnapshot } from "@/components/average-booking-value-snapshot"
 import { BookingsSnapshot } from "@/components/bookings-snapshot"
@@ -56,14 +58,24 @@ function SectionDivider() {
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [hasRun, setHasRun] = useState(false)
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
 
+  function handleLogout() {
+    setIsAuthenticated(false)
+    setHasRun(false)
+  }
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark)
   }, [isDark])
+
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />
+  }
 
   return (
     <div className="relative h-screen overflow-hidden bg-background text-foreground">
@@ -125,11 +137,17 @@ function App() {
                 </nav>
               </div>
 
-              {hasRun && (
-                <div className="mt-auto px-5 pb-6">
-                  <SectionNav />
-                </div>
-              )}
+              <div className="mt-auto shrink-0 px-5 pb-6 pt-4">
+                {hasRun && <SectionNav />}
+                <Button
+                  variant="outline"
+                  className={cn("w-full justify-start gap-2 bg-card", hasRun && "mt-4")}
+                  onClick={handleLogout}
+                >
+                  <LogOut className="size-4 shrink-0" />
+                  Log out
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-2">
@@ -168,6 +186,19 @@ function App() {
                   </a>
                 ))}
               </nav>
+
+              <div className="mt-auto w-full shrink-0 px-2 pb-4 pt-4">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-9 w-full bg-card"
+                  title="Log out"
+                  aria-label="Log out"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="size-4" />
+                </Button>
+              </div>
 
             </div>
           )}
@@ -229,7 +260,7 @@ function App() {
                     {isDark ? "Light mode" : "Dark mode"}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive focus:text-destructive">
+                  <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={handleLogout}>
                     <ArrowUpRight className="size-4" />
                     Log out
                   </DropdownMenuItem>
