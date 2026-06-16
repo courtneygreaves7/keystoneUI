@@ -22,30 +22,27 @@ export function SectionNav() {
   }
 
   return (
-    <div className="px-4 pb-6">
+    <div className="px-4 pb-2">
       {open && (
-        <div className="mb-2 overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-xs dark:border-transparent dark:bg-[oklch(0.13_0_0)] dark:text-[oklch(0.95_0_0)] dark:shadow-md">
-          {/* Header */}
+        <div className="mb-2 overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-xs">
           <div className="flex items-center gap-2.5 px-4 py-3.5">
-            <Layers className="size-3.5 shrink-0 text-muted-foreground dark:opacity-70 dark:text-current" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground dark:opacity-80 dark:text-current">
+            <Layers className="size-3.5 shrink-0 text-muted-foreground" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
               Jump to section
             </p>
           </div>
 
-          {/* Divider */}
-          <div className="mx-4 h-px bg-border dark:bg-[oklch(1_0_0_/_15%)]" />
+          <div className="mx-4 h-px bg-border" />
 
-          {/* Links */}
           <nav className="py-2">
             {NAV_ITEMS.map(({ label, anchor }) => (
               <button
                 key={anchor}
                 type="button"
                 onClick={() => scrollTo(anchor)}
-                className="flex w-full items-center gap-3 px-4 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-accent hover:text-accent-foreground dark:text-[oklch(0.95_0_0)] dark:hover:bg-transparent dark:hover:opacity-60"
+                className="flex w-full items-center gap-3 px-4 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
               >
-                <ArrowRight className="size-3 shrink-0 text-muted-foreground dark:opacity-50 dark:text-current" />
+                <ArrowRight className="size-3 shrink-0 text-muted-foreground" />
                 {label}
               </button>
             ))}

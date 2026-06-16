@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BarChart3, Ban, CalendarDays, ChevronLeft, ChevronRight, Filter, Play, RefreshCw, SlidersHorizontal, Tag, TrendingUp } from "lucide-react"
+import { Ban, RefreshCw, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { ActiveFilters } from "@/lib/chart-data"
+import { SectionNav } from "@/components/section-nav"
 
 const months = [
   "January",
@@ -35,12 +36,11 @@ const metricOptions = [
 ] as const
 
 type FilterSidebarProps = {
-  open: boolean
-  onToggle: () => void
   onRun: (filters: ActiveFilters) => void
+  hasRun: boolean
 }
 
-export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
+export function FilterSidebar({ onRun, hasRun }: FilterSidebarProps) {
   const [partner, setPartner] = useState("all-partners")
   const [brand, setBrand] = useState("all-brands")
   const [dateRange, setDateRange] = useState("year-to-month-end")
@@ -54,37 +54,10 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
   }
 
   return (
-    <aside className="relative flex min-h-0 flex-col border-l border-border bg-card">
-      <button
-        type="button"
-        aria-label={open ? "Collapse right sidebar" : "Expand right sidebar"}
-        onClick={onToggle}
-        className="absolute top-[calc(50vh-4rem)] left-0 z-20 flex h-16 w-5 -translate-x-full -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
-      >
-        {open ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
-      </button>
+    <aside className="relative flex min-h-0 flex-col overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-border" />
 
-      {!open && (
-        <div className="flex flex-col items-center gap-3 pt-5">
-          <span title="Partner"><Filter className="size-4 text-muted-foreground" /></span>
-          <span title="Brand"><Tag className="size-4 text-muted-foreground" /></span>
-          <span title="Date range"><CalendarDays className="size-4 text-muted-foreground" /></span>
-          <span title="Year / Month"><SlidersHorizontal className="size-4 text-muted-foreground" /></span>
-          <Separator className="w-6" />
-          <span title="Metrics"><BarChart3 className="size-4 text-muted-foreground" /></span>
-          <Separator className="w-6" />
-          <button
-            type="button"
-            onClick={handleRun}
-            title="Run report"
-            className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Play className="size-3.5" />
-          </button>
-        </div>
-      )}
-
-      <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6 data-[hidden=true]:hidden" data-hidden={!open}>
+      <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">
         <div>
           <h2 className="text-sm font-semibold">Filters</h2>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -92,7 +65,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="partner-filter">Partner</Label>
           <Select value={partner} onValueChange={setPartner}>
             <SelectTrigger id="partner-filter">
@@ -107,7 +80,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="brand-filter">Brand</Label>
           <Select value={brand} onValueChange={setBrand}>
             <SelectTrigger id="brand-filter">
@@ -122,7 +95,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="date-range-filter">Date range</Label>
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger id="date-range-filter">
@@ -137,7 +110,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="year-filter">Year</Label>
             <Select value={year} onValueChange={setYear}>
               <SelectTrigger id="year-filter">
@@ -151,7 +124,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="month-filter">Month</Label>
             <Select value={month} onValueChange={setMonth}>
               <SelectTrigger id="month-filter">
@@ -170,7 +143,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
 
         <Separator />
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h2 className="text-sm font-semibold">Metrics</h2>
           <div className="flex flex-col gap-2">
             {metricOptions.map(({ label, value, icon: Icon }) => (
@@ -188,7 +161,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h2 id="sort-filter-heading" className="text-sm font-semibold">
             Sort by
           </h2>
@@ -207,8 +180,14 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
         </div>
       </div>
 
-      <div className="border-t border-border p-6 data-[hidden=true]:hidden" data-hidden={!open}>
-        <Button className="w-full" onClick={handleRun}>Run</Button>
+      <div className="shrink-0">
+        {hasRun && <SectionNav />}
+        <div className="relative px-6 pb-6">
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-border" />
+          <div className="pt-4">
+            <Button className="w-full" onClick={handleRun}>Run</Button>
+          </div>
+        </div>
       </div>
     </aside>
   )

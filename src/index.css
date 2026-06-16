@@ -3,41 +3,74 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --canvas: oklch(0.985 0.002 264);
+  /* Brand palette */
+  --brand-pink: #ee2a7b;
+  --brand-dark-blue: #243748;
+  --brand-light-blue: #f1fdfe;
+  --brand-green: #a2ffe3;
+  --brand-grey-blue: #f1f6fb;
+
+  /* Surfaces */
+  --background: var(--brand-grey-blue);
+  --foreground: var(--brand-dark-blue);
+  --card: #ffffff;
+  --card-foreground: var(--brand-dark-blue);
+  --canvas: var(--brand-light-blue);
+
+  /* Actions */
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-dark-blue);
+
+  /* UI chrome */
+  --muted: var(--brand-light-blue);
+  --muted-foreground: #5a6d7d;
+  --accent: var(--brand-light-blue);
+  --accent-foreground: var(--brand-dark-blue);
+  --border: #d9e8ef;
+  --input: #d9e8ef;
+  --ring: var(--brand-pink);
+  --popover: #ffffff;
+  --popover-foreground: var(--brand-dark-blue);
+
+  /* Ambient gradients */
+  --gradient-from: #f1f6fb;
+  --gradient-mid: #f1fdfe;
+  --gradient-to: #eef8f6;
+  --glow-pink: rgb(238 42 123 / 0.07);
+  --glow-green: rgb(162 255 227 / 0.12);
+  --glow-blue: rgb(241 253 254 / 0.9);
+  --panel-bg: rgb(255 255 255 / 0.55);
+  --panel-border: rgb(36 55 72 / 0.08);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --canvas: oklch(0.17 0 0);
+  --background: #1a2835;
+  --foreground: var(--brand-light-blue);
+  --card: #243748;
+  --card-foreground: var(--brand-light-blue);
+  --canvas: #1e2f3d;
+
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-dark-blue);
+
+  --muted: #2d4454;
+  --muted-foreground: #9eb0be;
+  --accent: #2d4454;
+  --accent-foreground: var(--brand-light-blue);
+  --border: rgb(241 253 254 / 0.1);
+  --input: rgb(241 253 254 / 0.12);
+  --ring: var(--brand-pink);
+  --popover: #243748;
+  --popover-foreground: var(--brand-light-blue);
+
+  --gradient-from: #141f29;
+  --gradient-mid: #243748;
+  --gradient-to: #1a2835;
+  --glow-pink: rgb(238 42 123 / 0.14);
+  --glow-green: rgb(162 255 227 / 0.08);
+  --glow-blue: rgb(36 55 72 / 0.6);
+  --panel-bg: rgb(36 55 72 / 0.45);
+  --panel-border: rgb(241 253 254 / 0.08);
 }
 
 @theme inline {
@@ -58,6 +91,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-canvas: var(--canvas);
+  --color-brand: var(--brand-pink);
 }
 
 * {
@@ -68,11 +102,18 @@ html,
 body,
 #root {
   font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--background);
   color: var(--foreground);
+  background: linear-gradient(
+    165deg,
+    var(--gradient-from) 0%,
+    var(--gradient-mid) 42%,
+    var(--gradient-to) 100%
+  );
 }

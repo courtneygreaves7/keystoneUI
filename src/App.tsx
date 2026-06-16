@@ -3,8 +3,8 @@ import {
   ArrowUpRight,
   BarChart3,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Download,
   LayoutDashboard,
   MoonStar,
@@ -17,7 +17,6 @@ import { FilterSidebar } from "@/components/filter-sidebar"
 import { AverageBookingValueSnapshot } from "@/components/average-booking-value-snapshot"
 import { BookingsSnapshot } from "@/components/bookings-snapshot"
 import { CalFinancials } from "@/components/cal-financials"
-import { SectionNav } from "@/components/section-nav"
 import { TimingSnapshot } from "@/components/timing-snapshot"
 import { AbvPerDayChart } from "@/components/charts/abv-per-day-chart"
 import { BookingsMadePerDayChart } from "@/components/charts/bookings-made-per-day-chart"
@@ -34,6 +33,14 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 
@@ -43,10 +50,13 @@ const navItems = [
   { label: "Admin", icon: ShieldCheck },
 ]
 
+function SectionDivider() {
+  return <div aria-hidden className="h-px w-full bg-border" />
+}
+
 function App() {
   const [isDark, setIsDark] = useState(false)
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
   const [hasRun, setHasRun] = useState(false)
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
 
@@ -55,88 +65,116 @@ function App() {
   }, [isDark])
 
   return (
-    <div className="h-screen overflow-hidden bg-background text-foreground">
+    <div className="relative h-screen overflow-hidden bg-background text-foreground">
+
+      {/* ── Ambient brand glows ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-pink)_0%,transparent_68%)]" />
+        <div className="absolute -bottom-40 left-[20%] h-[480px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-green)_0%,transparent_68%)]" />
+        <div className="absolute top-[35%] right-[38%] h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-blue)_0%,transparent_72%)]" />
+      </div>
+
+      {/* ── Main grid ── */}
       <div
         className={cn(
-          "grid h-full transition-[grid-template-columns] duration-200",
+          "relative z-10 grid h-full transition-[grid-template-columns] duration-200",
           leftSidebarOpen ? "grid-cols-[230px_1fr]" : "grid-cols-[52px_1fr]"
         )}
       >
-        <aside className="relative flex h-full flex-col border-r border-border bg-card">
-          <button
-            type="button"
-            aria-label={leftSidebarOpen ? "Collapse left sidebar" : "Expand left sidebar"}
-            onClick={() => setLeftSidebarOpen((prev) => !prev)}
-            className="absolute top-1/2 right-0 z-20 flex h-16 w-5 translate-x-full -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {leftSidebarOpen ? (
-              <ChevronLeft className="size-4" />
-            ) : (
-              <ChevronRight className="size-4" />
-            )}
-          </button>
-
+        {/* ════ Left sidebar ════ */}
+        <aside className="relative flex h-full min-h-0 flex-col overflow-hidden">
           {leftSidebarOpen ? (
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <div className="px-6">
-                <div className="flex h-16 shrink-0 items-center gap-2 border-b border-border">
-                  <div className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
-                    <Mountain className="size-4" />
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="px-5">
+                {/* Logo row */}
+                <div className="flex h-16 shrink-0 items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--brand-dark-blue)] text-[var(--brand-light-blue)]">
+                      <Mountain className="size-3.5" />
+                    </div>
+                    <span className="truncate text-base font-semibold tracking-tight">Keystone</span>
                   </div>
-                  <span className="text-lg font-semibold">Keystone</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="size-8 shrink-0"
+                    onClick={() => setLeftSidebarOpen(false)}
+                    aria-label="Minimise sidebar"
+                    title="Minimise sidebar"
+                  >
+                    <ChevronsLeft className="size-4" />
+                  </Button>
                 </div>
-                <nav className="mt-6 space-y-2">
+
+                <nav className="mt-3 space-y-0.5">
                   {navItems.map(({ label, icon: Icon, active }) => (
                     <a
                       key={label}
                       href="#"
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors",
+                        "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                         active
                           ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
                       )}
                     >
-                      <Icon className="size-4" />
+                      <Icon className="size-4 shrink-0" />
                       {label}
                     </a>
                   ))}
                 </nav>
               </div>
-              {hasRun && (
-                <div className="mt-auto">
-                  <SectionNav />
-                </div>
-              )}
             </div>
           ) : (
-            <div className="flex flex-col items-center pt-5 gap-1">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground mb-4">
-                <Mountain className="size-4" />
-              </div>
-              {navItems.map(({ label, icon: Icon, active }) => (
-                <a
-                  key={label}
-                  href="#"
-                  aria-current={active ? "page" : undefined}
-                  title={label}
-                  className={cn(
-                    "flex size-9 items-center justify-center rounded-md transition-colors",
-                    active
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
+            <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-2">
+              <div className="flex h-16 w-full shrink-0 items-center justify-center border-b border-border/50">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-9"
+                  onClick={() => setLeftSidebarOpen(true)}
+                  aria-label="Expand sidebar"
+                  title="Expand sidebar"
                 >
-                  <Icon className="size-4" />
-                </a>
-              ))}
+                  <ChevronsRight className="size-4" />
+                </Button>
+              </div>
+
+              <div className="mt-4 flex size-7 items-center justify-center rounded-md bg-[var(--brand-dark-blue)] text-[var(--brand-light-blue)]">
+                <Mountain className="size-3.5" />
+              </div>
+
+              <nav className="mt-4 flex w-full flex-col items-center gap-1">
+                {navItems.map(({ label, icon: Icon, active }) => (
+                  <a
+                    key={label}
+                    href="#"
+                    aria-current={active ? "page" : undefined}
+                    title={label}
+                    className={cn(
+                      "flex size-9 items-center justify-center rounded-md transition-colors",
+                      active
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="size-4" />
+                  </a>
+                ))}
+              </nav>
+
             </div>
           )}
+
         </aside>
 
-        <div className="flex h-full min-w-0 flex-col overflow-hidden">
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
+        {/* ════ Main column — wrapped panel ════ */}
+        <div className="flex h-full min-h-0 min-w-0 flex-col p-3 pl-0">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[var(--panel-border)] bg-[var(--panel-bg)] shadow-[0_1px_0_rgb(255_255_255_/_0.4)_inset] backdrop-blur-md dark:shadow-none">
+
+          {/* ── Top nav ── */}
+          <header className="relative flex h-14 shrink-0 items-center justify-between px-5">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -153,32 +191,60 @@ function App() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
+                className="size-9 shrink-0 rounded-full"
                 onClick={() => setIsDark((value) => !value)}
                 aria-label="Toggle dark mode"
               >
                 {isDark ? <Sun className="size-4" /> : <MoonStar className="size-4" />}
               </Button>
-              <Button variant="outline" size="default">
-                Logout
-              </Button>
-              <div className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                CG
-              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-9 gap-2 rounded-full px-3"
+                    aria-label="User menu"
+                  >
+                    <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand-dark-blue)] text-[10px] font-semibold text-[var(--brand-light-blue)]">
+                      CG
+                      <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-2 border-background bg-emerald-500" />
+                    </span>
+                    <span className="text-sm font-medium">Courtney</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Courtney Greaves</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsDark((v) => !v)}>
+                    {isDark ? <Sun className="size-4" /> : <MoonStar className="size-4" />}
+                    {isDark ? "Light mode" : "Dark mode"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive focus:text-destructive">
+                    <ArrowUpRight className="size-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
+
+            {/* Bottom separator */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border/50"
+            />
           </header>
 
-          <div
-            className={cn(
-              "grid min-h-0 flex-1 transition-[grid-template-columns] duration-200",
-              rightSidebarOpen ? "grid-cols-[1fr_320px]" : "grid-cols-[1fr_52px]"
-            )}
-          >
-            <section className="min-w-0 overflow-y-auto bg-canvas px-20 py-12 xl:px-24 xl:py-14">
-              <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          {/* ── Center + right sidebar ── */}
+          <div className="grid min-h-0 flex-1 grid-cols-[1fr_300px] overflow-hidden">
+            {/* Center stage */}
+            <div className="min-h-0 min-w-0 overflow-hidden">
+              <section className="h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14">
+              <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     Sales, cancellation &amp; re-let metrics
@@ -205,7 +271,7 @@ function App() {
               </div>
 
               {!hasRun ? (
-                <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/20 py-16 text-center">
+                <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">
                   <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">
                     <BarChart3 className="size-6" />
                   </div>
@@ -217,57 +283,67 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <div className="divide-y divide-border">
+                <div>
                   <div id="section-bookings" className="scroll-mt-6 py-8">
                     <BookingsSnapshot filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-abv" className="scroll-mt-6 py-8">
                     <AverageBookingValueSnapshot filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-cal" className="scroll-mt-6 py-8">
                     <CalFinancials filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-timing" className="scroll-mt-6 py-8">
                     <TimingSnapshot filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-bookings-vs-stays" className="scroll-mt-6 py-8">
                     <BookingsVsStaysChart filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-abv-per-day" className="scroll-mt-6 py-8">
                     <AbvPerDayChart filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-lead-time" className="scroll-mt-6 py-8">
                     <LeadTimeChart filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-bookings-per-day" className="scroll-mt-6 py-8">
                     <BookingsMadePerDayChart filters={activeFilters} />
                   </div>
+                  <SectionDivider />
 
                   <div id="section-cal-ddl-takeup" className="scroll-mt-6 py-8">
                     <CalDdlTakeupChart filters={activeFilters} />
                   </div>
                 </div>
               )}
+              </section>
+            </div>
 
-            </section>
-
+            {/* Filter sidebar */}
             <FilterSidebar
-              open={rightSidebarOpen}
-              onToggle={() => setRightSidebarOpen((prev) => !prev)}
+              hasRun={hasRun}
               onRun={(filters) => {
                 setActiveFilters(filters)
                 setHasRun(true)
               }}
             />
           </div>
-        </div>
+
+          </div>{/* end rounded panel */}
+        </div>{/* end main column */}
       </div>
     </div>
   )
