@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BarChart3, CalendarDays, ChevronLeft, ChevronRight, Filter, Play, SlidersHorizontal, Tag } from "lucide-react"
+import { BarChart3, Ban, CalendarDays, ChevronLeft, ChevronRight, Filter, Play, RefreshCw, SlidersHorizontal, Tag, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -29,9 +29,9 @@ const months = [
 ]
 
 const metricOptions = [
-  { label: "Sales", value: "sales" },
-  { label: "Cancellations", value: "cancellations" },
-  { label: "Re-lets", value: "re-lets" },
+  { label: "Sales", value: "sales", icon: TrendingUp },
+  { label: "Cancellations", value: "cancellations", icon: Ban },
+  { label: "Re-lets", value: "re-lets", icon: RefreshCw },
 ] as const
 
 type FilterSidebarProps = {
@@ -59,7 +59,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
         type="button"
         aria-label={open ? "Collapse right sidebar" : "Expand right sidebar"}
         onClick={onToggle}
-        className="absolute top-1/2 left-0 z-20 flex h-16 w-5 -translate-x-full -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute top-[calc(50vh-4rem)] left-0 z-20 flex h-16 w-5 -translate-x-full -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
       >
         {open ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
       </button>
@@ -92,7 +92,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </p>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="partner-filter">Partner</Label>
           <Select value={partner} onValueChange={setPartner}>
             <SelectTrigger id="partner-filter">
@@ -107,7 +107,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </Select>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="brand-filter">Brand</Label>
           <Select value={brand} onValueChange={setBrand}>
             <SelectTrigger id="brand-filter">
@@ -122,7 +122,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           </Select>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="date-range-filter">Date range</Label>
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger id="date-range-filter">
@@ -137,7 +137,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Label htmlFor="year-filter">Year</Label>
             <Select value={year} onValueChange={setYear}>
               <SelectTrigger id="year-filter">
@@ -151,7 +151,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
             </Select>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Label htmlFor="month-filter">Month</Label>
             <Select value={month} onValueChange={setMonth}>
               <SelectTrigger id="month-filter">
@@ -170,24 +170,25 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
 
         <Separator />
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <h2 className="text-sm font-semibold">Metrics</h2>
           <div className="flex flex-col gap-2">
-            {metricOptions.map(({ label, value }) => (
+            {metricOptions.map(({ label, value, icon: Icon }) => (
               <Button
                 key={value}
                 type="button"
                 variant={metric === value ? "default" : "outline"}
-                className="w-full justify-start"
+                className="w-full justify-start gap-2"
                 onClick={() => setMetric(value)}
               >
+                <Icon className="size-3.5 shrink-0" />
                 {label}
               </Button>
             ))}
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <h2 id="sort-filter-heading" className="text-sm font-semibold">
             Sort by
           </h2>

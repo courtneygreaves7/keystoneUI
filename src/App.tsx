@@ -153,7 +153,7 @@ function App() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 size="icon"
@@ -165,6 +165,9 @@ function App() {
               <Button variant="outline" size="default">
                 Logout
               </Button>
+              <div className="ml-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                CG
+              </div>
             </div>
           </header>
 

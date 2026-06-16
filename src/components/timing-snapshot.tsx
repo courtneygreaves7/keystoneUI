@@ -188,7 +188,7 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
                             </span>
                           </div>
                           <p className="text-xl font-medium tracking-tight">{col.value}</p>
-                          <p className="mt-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                          <p className="mt-1 text-[11px] font-normal text-emerald-600 dark:text-emerald-400">
                             {col.cal}
                           </p>
                         </div>

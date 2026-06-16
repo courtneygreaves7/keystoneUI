@@ -193,7 +193,7 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
                           </span>
                         </div>
                         <p className="text-xl font-medium tracking-tight">{column.value}</p>
-                        <p className="mt-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                        <p className="mt-1 text-[11px] font-normal text-emerald-600 dark:text-emerald-400">
                           {column.cal}
                         </p>
                       </div>
