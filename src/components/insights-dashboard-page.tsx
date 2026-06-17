@@ -1,10 +1,14 @@
+import type { ReactNode } from "react"
 import {
   CalendarCheck,
   Clock,
   CreditCard,
+  DollarSign,
+  FileText,
   Gauge,
   Percent,
   PoundSterling,
+  Timer,
   TrendingUp,
   Wallet,
   type LucideIcon,
@@ -49,7 +53,7 @@ function DashboardKpiCard({ label, value, subtext, icon: Icon }: KpiCard) {
     <Card className="shadow-none">
       <CardHeader className="items-center p-3 pb-2">
         <div className="flex items-center gap-2">
-          <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
+          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
             <Icon className="size-3.5" />
           </div>
           <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
@@ -59,11 +63,26 @@ function DashboardKpiCard({ label, value, subtext, icon: Icon }: KpiCard) {
       </CardHeader>
       <CardContent className="p-3 pt-0">
         <p className="text-xl font-medium tracking-tight tabular-nums">{value}</p>
-        {subtext ? (
-          <p className="mt-1 text-[11px] text-muted-foreground">{subtext}</p>
-        ) : null}
+        <p className="mt-1 min-h-4 text-[11px] text-muted-foreground">{subtext ?? "\u00a0"}</p>
       </CardContent>
     </Card>
+  )
+}
+
+function DashboardSection({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        {title}
+      </h2>
+      {children}
+    </section>
   )
 }
 
@@ -81,24 +100,80 @@ export function InsightsDashboardPage({ filters }: InsightsDashboardPageProps) {
   const timing = getTimingProfile(filters)
   const partnerRows = getPartnerRows(filters)
 
-  const primaryKpis: KpiCard[] = [
+  const bookingKpis: KpiCard[] = [
     { label: "Total bookings", value: booking.total, icon: CalendarCheck },
-    { label: "GWP", value: calFin.gwp, icon: PoundSterling, subtext: "Gross written premium" },
-    { label: "GBP ABV", value: abv.gbpAbv, icon: Wallet, subtext: abv.gbpCal },
-    { label: "CAL take-up", value: booking.calPct, icon: Percent, subtext: `${booking.calSales} sales` },
-    { label: "DDL take-up", value: booking.ddlPct, icon: CreditCard, subtext: `${booking.ddlSales} sales` },
-    { label: "Avg lead time", value: timing.gbpDays, icon: Clock, subtext: timing.gbpCal },
+    { label: "CAL sales", value: booking.calSales, icon: TrendingUp },
+    { label: "CAL take-up %", value: booking.calPct, icon: Percent },
+    { label: "DDL sales", value: booking.ddlSales, icon: CreditCard },
+    { label: "DDL take-up %", value: booking.ddlPct, icon: Gauge },
   ]
 
-  const secondaryKpis: KpiCard[] = [
-    { label: "Total payable", value: calFin.totalPayable, icon: TrendingUp },
-    { label: "Premium inc. IPT", value: calFin.premiumInc, icon: Gauge },
-    { label: "EUR ABV", value: abv.eurAbv, icon: Wallet, subtext: abv.eurCal },
-    { label: "CAL price %", value: abv.calPct, icon: Percent },
+  const abvKpis: KpiCard[] = [
+    {
+      label: "ABV (excl. fee) GBP",
+      value: abv.gbpAbv,
+      subtext: abv.gbpCal,
+      icon: Wallet,
+    },
+    {
+      label: "ABV (excl. fee) EUR",
+      value: abv.eurAbv,
+      subtext: abv.eurCal,
+      icon: Wallet,
+    },
+    {
+      label: "ABV inc. fee GBP",
+      value: abv.gbpAbvFee,
+      subtext: abv.gbpCalFee,
+      icon: FileText,
+    },
+    {
+      label: "ABV inc. fee EUR",
+      value: abv.eurAbvFee,
+      subtext: abv.eurCalFee,
+      icon: FileText,
+    },
+    {
+      label: "CAL customer price",
+      value: abv.calPct,
+      subtext: "% of ABV inc. booking fee",
+      icon: Percent,
+    },
+  ]
+
+  const calFinancialKpis: KpiCard[] = [
+    { label: "Total payable", value: calFin.totalPayable, icon: DollarSign },
+    { label: "IPT", value: calFin.ipt, icon: DollarSign },
+    { label: "PISL comm", value: calFin.pislComm, icon: DollarSign },
+    { label: "Capacity net", value: calFin.capacityNet, icon: DollarSign },
+    { label: "PISL payable", value: calFin.pislPayable, icon: DollarSign },
+    { label: "Premium inc. IPT", value: calFin.premiumInc, icon: PoundSterling },
+    { label: "GWP", value: calFin.gwp, subtext: "Gross written premium", icon: PoundSterling },
+  ]
+
+  const timingKpis: KpiCard[] = [
+    {
+      label: "Avg booking to stay GBP",
+      value: timing.gbpDays,
+      subtext: timing.gbpCal,
+      icon: Clock,
+    },
+    {
+      label: "Avg booking to stay EUR",
+      value: timing.eurDays,
+      subtext: timing.eurCal,
+      icon: Clock,
+    },
+    {
+      label: "Avg cancel to stay",
+      value: "—",
+      subtext: "Days from cancellation to stay start",
+      icon: Timer,
+    },
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap gap-2">
         {[
           formatFilterLabel(filters.partner),
@@ -115,11 +190,37 @@ export function InsightsDashboardPage({ filters }: InsightsDashboardPageProps) {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {primaryKpis.map((kpi) => (
-          <DashboardKpiCard key={kpi.label} {...kpi} />
-        ))}
-      </div>
+      <DashboardSection title="Bookings">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+          {bookingKpis.map((kpi) => (
+            <DashboardKpiCard key={kpi.label} {...kpi} />
+          ))}
+        </div>
+      </DashboardSection>
+
+      <DashboardSection title="Average booking value">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+          {abvKpis.map((kpi) => (
+            <DashboardKpiCard key={kpi.label} {...kpi} />
+          ))}
+        </div>
+      </DashboardSection>
+
+      <DashboardSection title="CAL financials (GBP)">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+          {calFinancialKpis.map((kpi) => (
+            <DashboardKpiCard key={kpi.label} {...kpi} />
+          ))}
+        </div>
+      </DashboardSection>
+
+      <DashboardSection title="Timing">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {timingKpis.map((kpi) => (
+            <DashboardKpiCard key={kpi.label} {...kpi} />
+          ))}
+        </div>
+      </DashboardSection>
 
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
@@ -134,12 +235,6 @@ export function InsightsDashboardPage({ filters }: InsightsDashboardPageProps) {
       </div>
 
       <BookingsMadePerDayChart filters={filters} />
-
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {secondaryKpis.map((kpi) => (
-          <DashboardKpiCard key={kpi.label} {...kpi} />
-        ))}
-      </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
         <div className="border-b border-border px-5 py-4">

@@ -43,6 +43,8 @@
   --glow-blue: rgb(241 246 251 / 0.6);
   --panel-bg: var(--brand-grey-blue);
   --panel-border: rgb(36 55 72 / 0.08);
+  --tooltip: var(--brand-dark-blue);
+  --tooltip-foreground: #f8fbfc;
 }
 
 .dark {
@@ -75,6 +77,8 @@
   --glow-blue: rgb(36 55 72 / 0.6);
   --panel-bg: #1a2835;
   --panel-border: rgb(241 253 254 / 0.08);
+  --tooltip: #141f29;
+  --tooltip-foreground: #f1fdfe;
 }
 
 @theme inline {

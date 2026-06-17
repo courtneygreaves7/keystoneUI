@@ -40,8 +40,8 @@ export type Partner = {
 export const BOOKING_ENGINE_PARTNERS: Partner[] = [
   {
     id: "partner-a",
-    name: "Partner A",
-    initials: "PRTA",
+    name: "Partner Alpha",
+    initials: "PRAL",
     dataRoute: "API — EUR, GBP",
     products: ["CAL", "DDL"],
     activity: {
@@ -52,16 +52,16 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
     },
     currencies: ["EUR", "GBP"],
     brands: [
-      { id: "a-brand-1", name: "Brand A", policyGroup: "Partner A GB 4" },
-      { id: "a-brand-2", name: "Brand B", policyGroup: "Partner A GB 4" },
-      { id: "a-brand-3", name: "Brand C", policyGroup: "Partner A DK 2" },
-      { id: "a-brand-4", name: "Brand D", policyGroup: "Partner A EUR 3" },
+      { id: "a-brand-1", name: "Brand Alpha", policyGroup: "Partner Alpha GB 4" },
+      { id: "a-brand-2", name: "Brand Beta", policyGroup: "Partner Alpha GB 4" },
+      { id: "a-brand-3", name: "Brand Gamma", policyGroup: "Partner Alpha DK 2" },
+      { id: "a-brand-4", name: "Brand Delta", policyGroup: "Partner Alpha EUR 3" },
     ],
     policies: [
       {
         id: "a-p1",
         brandId: "a-brand-1",
-        name: "Partner A GB 4",
+        name: "Partner Alpha GB 4",
         validFrom: "1 Jun 2026",
         validTo: "ongoing",
         status: "active",
@@ -74,7 +74,7 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
       {
         id: "a-p2",
         brandId: "a-brand-2",
-        name: "Partner A GB 4",
+        name: "Partner Alpha GB 4",
         validFrom: "26 Dec 2025",
         validTo: "7 Apr 2026",
         status: "active",
@@ -87,7 +87,7 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
       {
         id: "a-p3",
         brandId: "a-brand-3",
-        name: "Partner A DK 2",
+        name: "Partner Alpha DK 2",
         validFrom: "1 Jan 2026",
         validTo: "ongoing",
         status: "active",
@@ -100,7 +100,7 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
       {
         id: "a-p4",
         brandId: "a-brand-4",
-        name: "Partner A EUR 3",
+        name: "Partner Alpha EUR 3",
         validFrom: "15 Mar 2025",
         validTo: "30 Nov 2025",
         status: "ended",
@@ -114,8 +114,8 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
   },
   {
     id: "partner-b",
-    name: "Partner B",
-    initials: "PRTB",
+    name: "Partner Beta",
+    initials: "PRBE",
     dataRoute: "API — GBP",
     products: ["DDL"],
     activity: {
@@ -126,14 +126,14 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
     },
     currencies: ["GBP"],
     brands: [
-      { id: "b-brand-1", name: "Brand A", policyGroup: "Partner B GB 1" },
-      { id: "b-brand-2", name: "Brand B", policyGroup: "Partner B GB 1" },
+      { id: "b-brand-1", name: "Brand Alpha", policyGroup: "Partner Beta GB 1" },
+      { id: "b-brand-2", name: "Brand Beta", policyGroup: "Partner Beta GB 1" },
     ],
     policies: [
       {
         id: "b-p1",
         brandId: "b-brand-1",
-        name: "Partner B GB 1",
+        name: "Partner Beta GB 1",
         validFrom: "1 Apr 2026",
         validTo: "ongoing",
         status: "active",
@@ -146,7 +146,7 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
       {
         id: "b-p2",
         brandId: "b-brand-2",
-        name: "Partner B GB 1",
+        name: "Partner Beta GB 1",
         validFrom: "10 Jan 2025",
         validTo: "31 Mar 2026",
         status: "ended",
@@ -160,8 +160,8 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
   },
   {
     id: "partner-c",
-    name: "Partner C",
-    initials: "PRTC",
+    name: "Partner Gamma",
+    initials: "PRGM",
     dataRoute: "S3 — GBP",
     products: ["CAL"],
     activity: {
@@ -171,12 +171,12 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
       withDdl: 0,
     },
     currencies: ["GBP"],
-    brands: [{ id: "c-brand-1", name: "Brand A", policyGroup: "Partner C GB 2" }],
+    brands: [{ id: "c-brand-1", name: "Brand Alpha", policyGroup: "Partner Gamma GB 2" }],
     policies: [
       {
         id: "c-p1",
         brandId: "c-brand-1",
-        name: "Partner C GB 2",
+        name: "Partner Gamma GB 2",
         validFrom: "1 Feb 2026",
         validTo: "ongoing",
         status: "active",

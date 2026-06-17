@@ -15,8 +15,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 1,
     name: "Willowcroft House",
-    partner: "Partner A",
-    brand: "Brand A",
+    partner: "Partner Alpha",
+    brand: "Brand Alpha",
     externalId: "BH2384",
     postcode: "LA22 0EU",
     country: "GB",
@@ -27,8 +27,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 2,
     name: null,
-    partner: "Partner A",
-    brand: "Brand A",
+    partner: "Partner Alpha",
+    brand: "Brand Alpha",
     externalId: "SF17",
     postcode: "AB55 5BT",
     country: "GB",
@@ -39,8 +39,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 3,
     name: null,
-    partner: "Partner A",
-    brand: "Brand B",
+    partner: "Partner Alpha",
+    brand: "Brand Beta",
     externalId: "CM412",
     postcode: "Unknown",
     country: "GB",
@@ -51,8 +51,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 4,
     name: null,
-    partner: "Partner A",
-    brand: "Brand B",
+    partner: "Partner Alpha",
+    brand: "Brand Beta",
     externalId: "DG891",
     postcode: "Not set",
     country: "GB",
@@ -63,8 +63,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 5,
     name: null,
-    partner: "Partner A",
-    brand: "Brand C",
+    partner: "Partner Alpha",
+    brand: "Brand Gamma",
     externalId: "WH204",
     postcode: "LA22 0EU",
     country: "GB",
@@ -75,8 +75,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 6,
     name: null,
-    partner: "Partner A",
-    brand: "Brand C",
+    partner: "Partner Alpha",
+    brand: "Brand Gamma",
     externalId: "LK773",
     postcode: "CA12 5AB",
     country: "GB",
@@ -87,8 +87,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 7,
     name: null,
-    partner: "Partner A",
-    brand: "Brand D",
+    partner: "Partner Alpha",
+    brand: "Brand Delta",
     externalId: "NR556",
     postcode: "PL23 1JA",
     country: "GB",
@@ -99,8 +99,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 8,
     name: null,
-    partner: "Partner A",
-    brand: "Brand D",
+    partner: "Partner Alpha",
+    brand: "Brand Delta",
     externalId: "OX119",
     postcode: "Unknown",
     country: "GB",
@@ -111,8 +111,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 9,
     name: null,
-    partner: "Partner A",
-    brand: "Brand A",
+    partner: "Partner Alpha",
+    brand: "Brand Alpha",
     externalId: "PE334",
     postcode: "TD15 1XX",
     country: "GB",
@@ -123,8 +123,8 @@ const PARTNER_A_PROPERTIES: PropertyListItem[] = [
   {
     code: 10,
     name: null,
-    partner: "Partner A",
-    brand: "Brand B",
+    partner: "Partner Alpha",
+    brand: "Brand Beta",
     externalId: "QT882",
     postcode: "Not set",
     country: "GB",
@@ -141,6 +141,6 @@ export function getPropertiesForPartner(partnerId: string): PropertyListItem[] {
 
   return PARTNER_A_PROPERTIES.map((property) => ({
     ...property,
-    partner: partnerId === "partner-b" ? "Partner B" : "Partner C",
+    partner: partnerId === "partner-b" ? "Partner Beta" : "Partner Gamma",
   }))
 }

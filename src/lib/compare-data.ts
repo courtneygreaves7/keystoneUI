@@ -7,16 +7,16 @@ import {
 } from "@/lib/chart-data"
 
 export const COMPARE_PARTNERS = [
-  { id: "partner-a", label: "Partner A" },
-  { id: "partner-b", label: "Partner B" },
-  { id: "partner-c", label: "Partner C" },
+  { id: "partner-a", label: "Partner Alpha" },
+  { id: "partner-b", label: "Partner Beta" },
+  { id: "partner-c", label: "Partner Gamma" },
 ] as const
 
 export const COMPARE_BRANDS = [
   { id: "all-brands", label: "All brands" },
-  { id: "brand-a", label: "Brand A" },
-  { id: "brand-b", label: "Brand B" },
-  { id: "brand-c", label: "Brand C" },
+  { id: "brand-a", label: "Brand Alpha" },
+  { id: "brand-b", label: "Brand Beta" },
+  { id: "brand-c", label: "Brand Gamma" },
 ] as const
 
 export type ComparePartnerId = (typeof COMPARE_PARTNERS)[number]["id"]

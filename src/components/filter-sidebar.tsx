@@ -72,9 +72,9 @@ export function FilterSidebar({ onRun }: FilterSidebarProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-partners">All partners</SelectItem>
-                <SelectItem value="partner-a">Partner A</SelectItem>
-                <SelectItem value="partner-b">Partner B</SelectItem>
-                <SelectItem value="partner-c">Partner C</SelectItem>
+                <SelectItem value="partner-a">Partner Alpha</SelectItem>
+                <SelectItem value="partner-b">Partner Beta</SelectItem>
+                <SelectItem value="partner-c">Partner Gamma</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -89,9 +89,9 @@ export function FilterSidebar({ onRun }: FilterSidebarProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-brands">All brands</SelectItem>
-                <SelectItem value="brand-a">Brand A</SelectItem>
-                <SelectItem value="brand-b">Brand B</SelectItem>
-                <SelectItem value="brand-c">Brand C</SelectItem>
+                <SelectItem value="brand-a">Brand Alpha</SelectItem>
+                <SelectItem value="brand-b">Brand Beta</SelectItem>
+                <SelectItem value="brand-c">Brand Gamma</SelectItem>
               </SelectContent>
             </Select>
           </div>
