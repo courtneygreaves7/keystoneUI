@@ -54,7 +54,7 @@ export function ComparePage() {
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card px-5 py-4">
         <div className="flex min-w-0 flex-1 items-stretch gap-3">
-          <span className="w-1 shrink-0 rounded-full bg-emerald-600" />
+          <span className="w-1 shrink-0 rounded-full bg-primary" />
           <div className="min-w-0">
             <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
               Primary

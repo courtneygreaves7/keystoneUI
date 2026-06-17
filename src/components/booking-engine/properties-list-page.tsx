@@ -46,14 +46,14 @@ export function PropertiesListPage({
         </p>
       </div>
 
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10">
-        <p className="text-sm text-emerald-900 dark:text-emerald-100">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/50 px-4 py-3">
+        <p className="text-sm text-foreground">
           Showing properties for <span className="font-semibold">{partner.name}</span>
         </p>
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-emerald-800 transition-colors hover:text-emerald-950 dark:text-emerald-200 dark:hover:text-emerald-50"
+          className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Clear filter
           <X className="size-3.5" />

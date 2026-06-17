@@ -41,7 +41,7 @@ export function PolicyRatesTable({ policies, selectedBrandId }: PolicyRatesTable
               <TableRow
                 key={policy.id}
                 className={cn(
-                  isHighlighted && "bg-emerald-500/5",
+                  isHighlighted && "bg-muted/40",
                   !isActive && "text-muted-foreground"
                 )}
               >
@@ -50,7 +50,7 @@ export function PolicyRatesTable({ policies, selectedBrandId }: PolicyRatesTable
                     <span
                       className={cn(
                         "mt-1.5 size-2 shrink-0 rounded-full",
-                        isActive ? "bg-emerald-500" : "bg-muted-foreground/40"
+                        isActive ? "bg-primary" : "bg-muted-foreground/40"
                       )}
                     />
                     <div>

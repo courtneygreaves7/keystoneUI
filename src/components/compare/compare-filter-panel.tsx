@@ -51,7 +51,7 @@ export function CompareFilterPanel({
       <div className={cn(embedded ? "px-5 pt-5" : "px-5 pt-4")}>
         <div className="flex items-center gap-2">
           <span
-            className={cn("size-2 rounded-full", isPrimary ? "bg-emerald-600" : "bg-blue-600")}
+            className={cn("size-2 rounded-full", isPrimary ? "bg-primary" : "bg-blue-600")}
           />
           <span className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
             {isPrimary ? "Primary" : "Comparison"}
