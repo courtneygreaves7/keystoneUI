@@ -135,7 +135,7 @@ function App() {
                         <ChevronsLeft className="size-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Minimise sidebar</TooltipContent>
+                    <TooltipContent>Minimise sidebar</TooltipContent>
                   </Tooltip>
                 </div>
 

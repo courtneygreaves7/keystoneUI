@@ -8,14 +8,14 @@
   --brand-dark-blue: #243748;
   --brand-light-blue: #f1fdfe;
   --brand-green: #a2ffe3;
-  --brand-grey-blue: #f1f6fb;
+  --brand-grey-blue: #f7fafc;
 
   /* Surfaces */
   --background: #ffffff;
   --foreground: var(--brand-dark-blue);
   --card: #ffffff;
   --card-foreground: var(--brand-dark-blue);
-  --canvas: #f4f7fa;
+  --canvas: #f8fafc;
   --field: #ffffff;
 
   /* Actions */
@@ -40,7 +40,7 @@
   --gradient-to: #ffffff;
   --glow-pink: rgb(238 42 123 / 0.05);
   --glow-green: rgb(162 255 227 / 0.04);
-  --glow-blue: rgb(241 246 251 / 0.6);
+  --glow-blue: rgb(247 250 252 / 0.6);
   --panel-bg: var(--brand-grey-blue);
   --panel-border: rgb(36 55 72 / 0.08);
   --tooltip: var(--brand-dark-blue);
