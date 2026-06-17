@@ -83,6 +83,8 @@ function App() {
     document.documentElement.classList.toggle("dark", isDark)
   }, [isDark])
 
+  const isInsightsDashboard = activeSection === "insights" && insightsView === "dashboard"
+
   if (!isAuthenticated) {
     return <LoginPage onLogin={() => setIsAuthenticated(true)} />
   }
@@ -296,10 +298,10 @@ function App() {
             )}
           >
             {/* Center stage */}
-            <div className={cn("min-h-0 min-w-0 overflow-hidden", insightsView === "dashboard" && "flex flex-col")}>
+            <div className={cn("min-h-0 min-w-0 overflow-hidden", isInsightsDashboard && "flex flex-col")}>
               <section
                 className={cn(
-                  insightsView === "dashboard"
+                  isInsightsDashboard
                     ? "flex min-h-0 flex-1 flex-col px-6 py-5 xl:px-8"
                     : "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14"
                 )}
@@ -320,7 +322,7 @@ function App() {
                 </div>
               ) : (
                 <>
-              <div className={cn("flex flex-wrap items-start justify-between gap-4", insightsView === "dashboard" ? "mb-4 shrink-0" : "mb-8")}>
+              <div className={cn("flex flex-wrap items-start justify-between gap-4", insightsView === "dashboard" ? "mb-8 shrink-0" : "mb-8")}>
                 <div>
                   {insightsView !== "compare" && (
                     <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
