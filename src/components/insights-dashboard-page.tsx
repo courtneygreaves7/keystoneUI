@@ -24,7 +24,7 @@ import { CalDdlTakeupChart } from "@/components/charts/cal-ddl-takeup-chart"
 import { LeadTimeChart } from "@/components/charts/lead-time-chart"
 import { DashboardFilterBar } from "@/components/dashboard-filter-bar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -66,18 +66,14 @@ type DashboardSlide = {
 function DashboardKpiCard({ label, value, subtext, icon: Icon }: KpiCard) {
   return (
     <Card className="shadow-none">
-      <CardHeader className="items-center p-3 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
-            <Icon className="size-3.5" />
-          </div>
-          <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-            {label}
-          </p>
+      <CardContent className="p-3">
+        <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
+          <Icon className="size-3.5" />
         </div>
-      </CardHeader>
-      <CardContent className="p-3 pt-0">
-        <p className="text-xl font-medium tracking-tight tabular-nums">{value}</p>
+        <p className="mt-2 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          {label}
+        </p>
+        <p className="mt-2 text-xl font-medium tracking-tight tabular-nums">{value}</p>
         <p className="mt-1 min-h-4 text-[11px] text-muted-foreground">{subtext ?? "\u00a0"}</p>
       </CardContent>
     </Card>
