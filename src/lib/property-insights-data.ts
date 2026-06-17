@@ -16,6 +16,7 @@ export type BookingSourceItem = {
   value: number
   type: "Channel" | "Web traffic"
   isWebTraffic?: boolean
+  vsOther?: number
 }
 
 export const PROPERTY_INSIGHT_METRICS: PropertyInsightMetric[] = [
@@ -103,5 +104,5 @@ export const PROPERTY_RANKED_BOOKING_SOURCES: BookingSourceItem[] = [
   { label: "Direct", value: 8, type: "Channel" },
   { label: "Airbnb", value: 3, type: "Channel" },
   { label: "Booking.com", value: 1, type: "Channel" },
-  { label: "Website traffic", value: 12, type: "Web traffic", isWebTraffic: true },
+  { label: "Website traffic", value: 12, type: "Web traffic", isWebTraffic: true, vsOther: 0 },
 ]

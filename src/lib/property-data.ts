@@ -36,7 +36,7 @@ export const MOCK_PROPERTY: Property = {
   country: "United Kingdom",
   maxOccupancy: "6",
   bookingCount: 12,
-  imageUrl: "/images/property-bh2384.jpg",
+  imageUrl: "/images/property-bh2384.png",
   bookings: [
     {
       id: "PCB-019d09dc-868f-7525-ab31-0d5e0f15c801",

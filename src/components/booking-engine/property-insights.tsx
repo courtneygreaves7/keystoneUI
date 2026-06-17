@@ -174,13 +174,13 @@ function BookingSourceCard({ source, rank }: { source: BookingSourceItem; rank: 
       <Card className="flex h-full flex-col shadow-none">
         <CardHeader className="items-center p-3 pb-2">
           <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-            Web traffic
+            Booking stream
           </p>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col p-3 pt-0">
           <p className="text-base font-medium tracking-tight">{source.label}</p>
           <p className="mt-1 min-h-4 text-[11px] text-muted-foreground">
-            {source.value} visits · {source.type}
+            {source.value} visits · vs other · {source.vsOther ?? 0}
           </p>
         </CardContent>
       </Card>

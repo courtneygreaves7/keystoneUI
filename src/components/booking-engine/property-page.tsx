@@ -109,17 +109,17 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
         </p>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="overflow-hidden rounded-xl border border-border bg-muted/20">
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
+        <div className="flex h-full min-h-0 flex-col gap-3 sm:flex-row">
+          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-muted/20 sm:min-h-0">
             <img
               src={property.imageUrl}
               alt={`${property.name} exterior`}
-              className="aspect-[3/2] w-full object-cover object-[center_42%]"
+              className="absolute inset-0 h-full w-full object-cover object-[center_62%]"
             />
           </div>
 
-          <div className="relative aspect-[3/2] overflow-hidden rounded-xl border border-border bg-[#f3f6f9] dark:bg-muted/20">
+          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-[#f3f6f9] dark:bg-muted/20 sm:min-h-0">
             <div
               aria-hidden
               className="absolute inset-0 bg-[linear-gradient(to_right,rgb(36_55_72/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(36_55_72/0.06)_1px,transparent_1px)] bg-size-[28px_28px]"

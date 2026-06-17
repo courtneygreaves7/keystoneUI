@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { PartnerCard } from "@/components/booking-engine/partner-card"
+import { PropertiesListPage } from "@/components/booking-engine/properties-list-page"
 import { PropertyPage } from "@/components/booking-engine/property-page"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -22,6 +23,7 @@ import {
   formatCurrency,
 } from "@/lib/booking-engine-data"
 import { MOCK_PROPERTY } from "@/lib/property-data"
+import { getPropertiesForPartner } from "@/lib/properties-list-data"
 
 const summaryItems: { label: string; value: string; icon: LucideIcon }[] = [
   { label: "Partners", value: formatCount(BOOKING_ENGINE_SUMMARY.partners), icon: Users },
@@ -54,13 +56,29 @@ const summaryItems: { label: string; value: string; icon: LucideIcon }[] = [
 
 export function BookingEnginePage() {
   const [expandedPartnerId, setExpandedPartnerId] = useState<string>("partner-a")
+  const [propertiesPartnerId, setPropertiesPartnerId] = useState<string | null>(null)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+
+  const propertiesPartner = BOOKING_ENGINE_PARTNERS.find(
+    (partner) => partner.id === propertiesPartnerId
+  )
 
   if (selectedPropertyId) {
     return (
       <PropertyPage
         property={MOCK_PROPERTY}
         onBack={() => setSelectedPropertyId(null)}
+      />
+    )
+  }
+
+  if (propertiesPartner) {
+    return (
+      <PropertiesListPage
+        partner={propertiesPartner}
+        properties={getPropertiesForPartner(propertiesPartner.id)}
+        onBack={() => setPropertiesPartnerId(null)}
+        onViewProperty={setSelectedPropertyId}
       />
     )
   }
@@ -119,7 +137,7 @@ export function BookingEnginePage() {
                 current === partner.id ? "" : partner.id
               )
             }
-            onViewProperty={() => setSelectedPropertyId(MOCK_PROPERTY.id)}
+            onViewProperty={() => setPropertiesPartnerId(partner.id)}
           />
         ))}
       </div>
