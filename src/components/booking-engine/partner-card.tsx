@@ -82,7 +82,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
       {expanded && (
         <div className="border-t border-border">
           <div className="grid lg:grid-cols-[260px_minmax(0,1fr)]">
-            <aside className="space-y-8 border-border px-7 py-7 dark:bg-canvas lg:border-r">
+            <aside className="space-y-8 border-border px-7 py-7 lg:border-r">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                   Activity
@@ -96,7 +96,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
                   ].map((stat) => (
                     <div
                       key={stat.label}
-                      className="rounded-lg border border-border bg-muted/20 px-3.5 py-3"
+                      className="rounded-lg border border-border bg-muted/20 px-3.5 py-3 dark:bg-canvas"
                     >
                       <dt className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
                         {stat.label}
@@ -151,7 +151,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
               </div>
             </aside>
 
-            <div className="px-7 py-7">
+            <div className="px-7 py-7 dark:bg-canvas">
               <p className="mb-4 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                 Policy rates
               </p>

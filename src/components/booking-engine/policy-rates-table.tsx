@@ -23,7 +23,7 @@ export function PolicyRatesTable({ policies, selectedBrandId }: PolicyRatesTable
     <div className="overflow-hidden rounded-lg border border-border">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/30 hover:bg-muted/30 dark:bg-canvas dark:hover:bg-canvas">
+          <TableRow className="bg-muted/30 hover:bg-muted/30 dark:bg-card dark:hover:bg-card">
             <TableHead className="h-12 px-5">Name / valid dates</TableHead>
             <TableHead className="px-5 text-right">Net rate</TableHead>
             <TableHead className="px-5 text-right">Gross rate</TableHead>
