@@ -68,22 +68,23 @@ function restoreElementStyles(resets: StyleReset[]) {
 function fixSnapshotAlignment(root: HTMLElement) {
   root.querySelectorAll<HTMLElement>("[data-snapshot-pill]").forEach((pill) => {
     pill.style.display = "inline-block"
-    pill.style.height = "32px"
-    pill.style.padding = "0 16px"
     pill.style.boxSizing = "border-box"
-    pill.style.border = "none"
-    pill.style.verticalAlign = "middle"
+    pill.style.height = "32px"
+    pill.style.lineHeight = "30px"
+    pill.style.paddingTop = "0"
+    pill.style.paddingBottom = "0"
+    pill.style.paddingLeft = "16px"
+    pill.style.paddingRight = "16px"
     pill.style.textAlign = "center"
+    pill.style.verticalAlign = "middle"
+    pill.style.fontSize = "11px"
+    pill.style.fontWeight = "500"
+    pill.style.margin = "0"
+    pill.style.whiteSpace = "nowrap"
 
-    const label = pill.querySelector<HTMLElement>("span") ?? pill
-    label.style.display = "inline-block"
-    label.style.height = "32px"
-    label.style.lineHeight = "32px"
-    label.style.fontSize = "11px"
-    label.style.fontWeight = "500"
-    label.style.margin = "0"
-    label.style.padding = "0"
-    label.style.verticalAlign = "middle"
+    if (getComputedStyle(pill).borderWidth === "0px") {
+      pill.style.border = "1px solid transparent"
+    }
   })
 
   root.querySelectorAll<HTMLElement>(".recharts-legend-item").forEach((item) => {

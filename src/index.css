@@ -140,7 +140,22 @@ body {
 }
 
 [data-snapshot-pill] {
-  padding-top: 0;
-  padding-bottom: 0;
-  line-height: 2rem;
+  display: inline-block;
+  box-sizing: border-box;
+  height: 2rem;
+  padding-inline: 1rem;
+  padding-block: 0;
+  border: 1px solid transparent;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: calc(2rem - 2px);
+  white-space: nowrap;
+}
+
+button[data-snapshot-pill] {
+  appearance: none;
+  cursor: pointer;
+  font-family: inherit;
 }

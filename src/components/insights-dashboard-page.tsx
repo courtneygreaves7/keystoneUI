@@ -168,21 +168,21 @@ function DashboardCarousel({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col bg-card">
-        <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border px-4 py-3">
+        <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-border px-4 py-3">
           {slides.map((slide, slideIndex) => (
             <button
               key={slide.id}
               type="button"
               onClick={() => setIndex(slideIndex)}
               className={cn(
-                "inline-block h-8 shrink-0 rounded-full border-0 px-4 py-0 text-center text-[11px] font-medium leading-8 transition-colors",
+                "shrink-0 rounded-full border border-transparent transition-colors",
                 slideIndex === index
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
               )}
               data-snapshot-pill
             >
-              <span className="block h-8 leading-8">{slide.title}</span>
+              {slide.title}
             </button>
           ))}
         </div>
@@ -527,14 +527,14 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
             </div>
           ) : (
             <div ref={snapshotRef} data-snapshot-capture className="flex min-h-0 flex-1 flex-col gap-3">
-              <div className="flex shrink-0 flex-wrap gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {filterChips.map((chip) => (
                   <span
                     key={chip}
-                    className="inline-block h-8 rounded-full border border-border bg-card px-4 py-0 text-center text-[11px] font-medium leading-8 text-muted-foreground"
+                    className="rounded-full border border-border bg-card text-muted-foreground"
                     data-snapshot-pill
                   >
-                    <span className="block h-8 leading-8">{chip}</span>
+                    {chip}
                   </span>
                 ))}
               </div>
