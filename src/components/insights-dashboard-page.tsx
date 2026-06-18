@@ -535,8 +535,8 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
           </div>
         )}
 
-        <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
-          <div className="col-span-3 flex min-h-0 min-w-0 flex-col">
+        <div className="flex min-h-0 flex-1 gap-5">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             {!hasRun ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 py-10 text-center">
                 <p className="text-sm font-medium">No data to display</p>
@@ -553,7 +553,7 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
             )}
           </div>
 
-          <div className="col-span-1 flex min-h-0 min-w-0 flex-col" data-snapshot-exclude>
+          <div className="flex w-56 shrink-0 flex-col min-h-0" data-snapshot-exclude>
             <DashboardFilterBar filters={filters} onRun={onRun} />
           </div>
         </div>
