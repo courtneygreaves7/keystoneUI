@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from "react"
+import { useRef, useState, type ReactNode } from "react"
 import {
   CalendarCheck,
+  Camera,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -112,8 +113,21 @@ function KpiGrid({ kpis, columns }: { kpis: KpiCard[]; columns: string }) {
   )
 }
 
-function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
+function buildSnapshotFilename(slideId: string, filters: ActiveFilters) {
+  const period = `${filters.month}-${filters.year}`.toLowerCase().replace(/\s+/g, "-")
+  return `keystone-${slideId}-${period}.png`
+}
+
+function DashboardCarousel({
+  slides,
+  filters,
+}: {
+  slides: DashboardSlide[]
+  filters: ActiveFilters
+}) {
   const [index, setIndex] = useState(0)
+  const [isExporting, setIsExporting] = useState(false)
+  const snapshotRef = useRef<HTMLDivElement>(null)
   const current = slides[index]
 
   function goPrev() {
@@ -122,6 +136,45 @@ function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
 
   function goNext() {
     setIndex((currentIndex) => (currentIndex === slides.length - 1 ? 0 : currentIndex + 1))
+  }
+
+  async function handleExportSnapshot() {
+    if (!snapshotRef.current || isExporting) return
+
+    setIsExporting(true)
+    try {
+      const { default: html2canvas } = await import("html2canvas")
+      const cardBg =
+        getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#ffffff"
+      const scrollArea = snapshotRef.current.querySelector<HTMLElement>("[data-snapshot-scroll]")
+      const previousOverflow = scrollArea?.style.overflow
+      const previousHeight = scrollArea?.style.height
+
+      if (scrollArea) {
+        scrollArea.style.overflow = "visible"
+        scrollArea.style.height = "auto"
+      }
+
+      const canvas = await html2canvas(snapshotRef.current, {
+        backgroundColor: cardBg,
+        scale: 2,
+        useCORS: true,
+        height: snapshotRef.current.scrollHeight,
+        windowHeight: snapshotRef.current.scrollHeight,
+      })
+
+      if (scrollArea) {
+        scrollArea.style.overflow = previousOverflow ?? ""
+        scrollArea.style.height = previousHeight ?? ""
+      }
+
+      const link = document.createElement("a")
+      link.download = buildSnapshotFilename(current.id, filters)
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -157,34 +210,50 @@ function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
         </Button>
       </div>
 
-      <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border px-4 py-3">
-        {slides.map((slide, slideIndex) => (
-          <button
-            key={slide.id}
-            type="button"
-            onClick={() => setIndex(slideIndex)}
-            className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-[11px] font-medium transition-colors",
-              slideIndex === index
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-          >
-            {slide.title}
-          </button>
-        ))}
+      <div ref={snapshotRef} className="flex min-h-0 flex-1 flex-col bg-card">
+        <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border px-4 py-3">
+          {slides.map((slide, slideIndex) => (
+            <button
+              key={slide.id}
+              type="button"
+              onClick={() => setIndex(slideIndex)}
+              className={cn(
+                "shrink-0 rounded-full px-4 py-2 text-[11px] font-medium transition-colors",
+                slideIndex === index
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
+            >
+              {slide.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto" data-snapshot-scroll>
+          <div className="px-5 pt-12 pb-6">
+            <div className="mb-5">
+              <h3 className="text-sm font-semibold">{current.heading}</h3>
+              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                {current.description}
+              </p>
+            </div>
+            <div className="w-full">{current.content}</div>
+          </div>
+        </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="px-5 pt-12 pb-6">
-          <div className="mb-5">
-            <h3 className="text-sm font-semibold">{current.heading}</h3>
-            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-              {current.description}
-            </p>
-          </div>
-          <div className="w-full">{current.content}</div>
-        </div>
+      <div className="flex shrink-0 items-center justify-end border-t border-border px-4 py-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={handleExportSnapshot}
+          disabled={isExporting}
+        >
+          <Camera className="size-3.5" />
+          {isExporting ? "Exporting…" : "Export snapshot"}
+        </Button>
       </div>
     </div>
   )
@@ -492,7 +561,7 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
               </p>
             </div>
           ) : (
-            <DashboardCarousel slides={slides} />
+            <DashboardCarousel slides={slides} filters={filters} />
           )}
         </div>
 

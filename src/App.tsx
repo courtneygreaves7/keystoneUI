@@ -130,12 +130,12 @@ function App() {
                         size="icon"
                         className="size-8 shrink-0"
                         onClick={() => setLeftSidebarOpen(false)}
-                        aria-label="Minimise sidebar"
+                        aria-label="Hide navigation"
                       >
                         <ChevronsLeft className="size-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Minimise sidebar</TooltipContent>
+                    <TooltipContent>Hide navigation</TooltipContent>
                   </Tooltip>
                 </div>
 
@@ -175,16 +175,20 @@ function App() {
           ) : (
             <div className="flex min-h-0 flex-1 flex-col items-center overflow-visible px-2">
               <div className="flex h-16 w-full shrink-0 items-center justify-center border-b border-border/50">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9"
-                  onClick={() => setLeftSidebarOpen(true)}
-                  aria-label="Expand sidebar"
-                  title="Expand sidebar"
-                >
-                  <ChevronsRight className="size-4" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-9"
+                      onClick={() => setLeftSidebarOpen(true)}
+                      aria-label="Show navigation"
+                    >
+                      <ChevronsRight className="size-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Show navigation</TooltipContent>
+                </Tooltip>
               </div>
 
               <nav className="mt-4 flex w-full flex-col items-center gap-1">
