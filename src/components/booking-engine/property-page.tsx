@@ -50,8 +50,8 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
     },
     {
       label: "Location",
-      value: property.location,
-      subtext: property.country,
+      value: property.postcode,
+      subtext: `${property.county}, ${property.country}`,
       icon: MapPin,
     },
     {
@@ -111,7 +111,7 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
 
       <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
         <div className="flex h-full min-h-0 flex-col gap-3 sm:flex-row">
-          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-muted/20 sm:min-h-0">
+          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-muted/45 sm:min-h-0 dark:bg-muted/20">
             <img
               src={property.imageUrl}
               alt={`${property.name} exterior`}
@@ -119,18 +119,20 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
             />
           </div>
 
-          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-[#f3f6f9] dark:bg-muted/20 sm:min-h-0">
+          <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-muted/45 sm:min-h-0 dark:bg-muted/20">
             <div
               aria-hidden
-              className="absolute inset-0 bg-[linear-gradient(to_right,rgb(36_55_72/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(36_55_72/0.06)_1px,transparent_1px)] bg-size-[28px_28px]"
+              className="absolute inset-0 bg-[linear-gradient(to_right,rgb(36_55_72/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(36_55_72/0.06)_1px,transparent_1px)] bg-size-[28px_28px] dark:bg-[linear-gradient(to_right,rgb(241_253_254/0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgb(241_253_254/0.07)_1px,transparent_1px)]"
             />
             <div className="absolute inset-0 flex items-center justify-center p-6">
               <div className="flex flex-col items-center gap-2 text-center text-muted-foreground">
                 <div className="grid size-10 place-items-center rounded-full bg-background shadow-xs">
                   <MapPin className="size-5 text-primary" />
                 </div>
-                <p className="text-sm font-medium text-foreground">{property.location}</p>
-                <p className="text-xs">{property.country}</p>
+                <p className="text-sm font-medium text-foreground">{property.postcode}</p>
+                <p className="text-xs">
+                  {property.county}, {property.country}
+                </p>
               </div>
             </div>
           </div>
@@ -145,7 +147,7 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
 
       <div className="space-y-4">
         <Tabs defaultValue="bookings" className="gap-5">
-          <TabsList className="bg-[var(--brand-grey-blue)] dark:bg-muted">
+          <TabsList className="bg-accent dark:bg-muted">
             <TabsTrigger value="bookings">Bookings ({property.bookingCount})</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="details">Property details</TabsTrigger>
@@ -214,10 +216,10 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
 
 function SnapshotCard({ label, value, subtext, icon: Icon }: SnapshotCard) {
   return (
-    <Card className="flex h-full flex-col shadow-none">
-      <CardHeader className="items-center p-3 pb-2">
+    <Card className="flex h-full flex-col overflow-hidden shadow-none">
+      <CardHeader className="items-center border-b border-border/60 bg-muted/55 p-3 pb-2 dark:border-border dark:bg-muted/25">
         <div className="flex items-center gap-2">
-          <div className="grid size-6 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+          <div className="grid size-6 shrink-0 place-items-center rounded-md bg-background/80 text-muted-foreground dark:bg-muted">
             <Icon className="size-3" />
           </div>
           <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
@@ -225,7 +227,7 @@ function SnapshotCard({ label, value, subtext, icon: Icon }: SnapshotCard) {
           </p>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col p-3 pt-0">
+      <CardContent className="flex flex-1 flex-col bg-muted/35 p-3 pt-3 dark:bg-muted/10">
         <p className="text-base font-medium tracking-tight">{value}</p>
         <p className="mt-1 min-h-4 text-[11px] text-muted-foreground">{subtext ?? "\u00a0"}</p>
       </CardContent>
