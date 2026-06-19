@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import {
   ArrowUpRight,
   BarChart3,
@@ -69,6 +69,88 @@ type InsightsView = "insights" | "compare" | "dashboard"
 
 function SectionDivider() {
   return <div aria-hidden className="h-px w-full bg-border" />
+}
+
+function InsightsActionButtons({
+  insightsView,
+  setInsightsView,
+  collapsed = false,
+}: {
+  insightsView: InsightsView
+  setInsightsView: React.Dispatch<React.SetStateAction<InsightsView>>
+  collapsed?: boolean
+}) {
+  const buttonClass = collapsed
+    ? "size-9"
+    : "w-full justify-start gap-2 bg-card text-xs"
+
+  function renderButton(
+    label: string,
+    icon: ReactNode,
+    onClick: () => void,
+    variant: "outline" | "default" = "outline"
+  ) {
+    if (collapsed) {
+      return (
+        <Tooltip key={label}>
+          <TooltipTrigger asChild>
+            <Button
+              variant={variant}
+              size="icon"
+              className={buttonClass}
+              onClick={onClick}
+              aria-label={label}
+            >
+              {icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{label}</TooltipContent>
+        </Tooltip>
+      )
+    }
+
+    return (
+      <Button key={label} variant={variant} className={buttonClass} onClick={onClick}>
+        {icon}
+        {label}
+      </Button>
+    )
+  }
+
+  const buttons = [
+    insightsView !== "compare"
+      ? renderButton(
+          insightsView === "dashboard" ? "Report view" : "Dashboard",
+          insightsView === "dashboard" ? (
+            <BarChart3 className="size-3.5" />
+          ) : (
+            <LayoutDashboard className="size-3.5" />
+          ),
+          () => setInsightsView((view) => (view === "dashboard" ? "insights" : "dashboard"))
+        )
+      : null,
+    renderButton(
+      "Schedule report",
+      <Calendar className="size-3.5" />,
+      () => undefined
+    ),
+    renderButton(
+      insightsView === "compare" ? "Exit compare" : "Compare",
+      insightsView === "compare" ? (
+        <ArrowLeftRight className="size-3.5" />
+      ) : (
+        <ArrowUpRight className="size-3.5" />
+      ),
+      () => setInsightsView((view) => (view === "compare" ? "insights" : "compare"))
+    ),
+    renderButton("Export", <Download className="size-3.5" />, () => undefined, "default"),
+  ].filter(Boolean)
+
+  return (
+    <div className={cn(collapsed ? "flex flex-col items-center gap-1" : "space-y-2")}>
+      {buttons}
+    </div>
+  )
 }
 
 function App() {
@@ -158,6 +240,15 @@ function App() {
                     </button>
                   ))}
                 </nav>
+
+                {activeSection === "insights" && (
+                  <div className="mt-4 border-t border-border/50 pt-4">
+                    <InsightsActionButtons
+                      insightsView={insightsView}
+                      setInsightsView={setInsightsView}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="relative z-30 mt-auto shrink-0 overflow-visible px-5 pb-6 pt-4">
@@ -212,6 +303,13 @@ function App() {
               </nav>
 
               <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-1 overflow-visible px-2 pb-4 pt-4">
+                {activeSection === "insights" && (
+                  <InsightsActionButtons
+                    insightsView={insightsView}
+                    setInsightsView={setInsightsView}
+                    collapsed
+                  />
+                )}
                 {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav collapsed />}
                 <button
                   type="button"
@@ -338,89 +436,30 @@ function App() {
                 </div>
               ) : (
                 <>
-              <div className={cn("flex flex-wrap items-start justify-between gap-4", insightsView === "dashboard" ? "mb-8 shrink-0" : "mb-8")}>
+              {insightsView !== "dashboard" && (
+              <div className="mb-8">
                 <div>
                   {insightsView !== "compare" && (
                     <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
-                      {insightsView === "dashboard" ? (
-                        <LayoutDashboard className="size-3.5 text-muted-foreground" />
-                      ) : (
-                        <BarChart3 className="size-3.5 text-muted-foreground" />
-                      )}
+                      <BarChart3 className="size-3.5 text-muted-foreground" />
                       <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-                        {insightsView === "dashboard" ? "Dashboard" : "Analytics"}
+                        Analytics
                       </span>
                     </div>
                   )}
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     {insightsView === "compare"
                       ? "Compare partners"
-                      : insightsView === "dashboard"
-                        ? "Insights dashboard"
-                        : "Sales, cancellation & re-let metrics"}
+                      : "Sales, cancellation & re-let metrics"}
                   </h1>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {insightsView === "compare"
                       ? "Set filters for a primary and comparison side, then run to review metrics side by side."
-                      : insightsView === "dashboard"
-                        ? "At-a-glance KPIs, charts and partner performance for your selected filters."
-                        : "Real-time across 3 partners"}
+                      : "Real-time across 3 partners"}
                   </p>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {insightsView !== "compare" && (
-                    <Button
-                      variant="outline"
-                      className="text-xs"
-                      onClick={() =>
-                        setInsightsView((view) => (view === "dashboard" ? "insights" : "dashboard"))
-                      }
-                    >
-                      {insightsView === "dashboard" ? (
-                        <>
-                          <BarChart3 className="size-3.5" />
-                          Report view
-                        </>
-                      ) : (
-                        <>
-                          <LayoutDashboard className="size-3.5" />
-                          Dashboard
-                        </>
-                      )}
-                    </Button>
-                  )}
-                  <Button variant="outline" className="text-xs">
-                    <Calendar className="size-3.5" />
-                    Schedule report
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="text-xs"
-                    onClick={() =>
-                      setInsightsView((view) =>
-                        view === "compare" ? "insights" : "compare"
-                      )
-                    }
-                  >
-                    {insightsView === "compare" ? (
-                      <>
-                        <ArrowLeftRight className="size-3.5" />
-                        Exit compare
-                      </>
-                    ) : (
-                      <>
-                        <ArrowUpRight className="size-3.5" />
-                        Compare
-                      </>
-                    )}
-                  </Button>
-                  <Button className="text-xs">
-                    <Download className="size-3.5" />
-                    Export
-                  </Button>
-                </div>
               </div>
+              )}
 
               {insightsView === "compare" ? (
                 <ComparePage />
