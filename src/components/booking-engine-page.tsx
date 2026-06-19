@@ -5,7 +5,6 @@ import {
   Download,
   Home,
   PoundSterling,
-  Zap,
   Tags,
   Users,
   type LucideIcon,
@@ -87,12 +86,6 @@ export function BookingEnginePage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
-            <Zap className="size-3.5 text-muted-foreground" />
-            <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-              Booking engine
-            </span>
-          </div>
           <h1 className="text-[22px] font-semibold tracking-tight">Partners &amp; policies</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Configure partner connections, manage brands, and review active policy rates across the

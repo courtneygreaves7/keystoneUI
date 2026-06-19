@@ -340,18 +340,6 @@ function App() {
                 <>
               <div className={cn("flex flex-wrap items-start justify-between gap-4", insightsView === "dashboard" ? "mb-8 shrink-0" : "mb-8")}>
                 <div>
-                  {insightsView !== "compare" && (
-                    <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
-                      {insightsView === "dashboard" ? (
-                        <LayoutDashboard className="size-3.5 text-muted-foreground" />
-                      ) : (
-                        <BarChart3 className="size-3.5 text-muted-foreground" />
-                      )}
-                      <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-                        {insightsView === "dashboard" ? "Dashboard" : "Analytics"}
-                      </span>
-                    </div>
-                  )}
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     {insightsView === "compare"
                       ? "Compare partners"
