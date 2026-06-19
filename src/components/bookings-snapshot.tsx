@@ -1,17 +1,9 @@
 import { useState } from "react"
-import {
-  CalendarCheck,
-  CreditCard,
-  Gauge,
-  Info,
-  LayoutList,
-  Percent,
-  TrendingUp,
-  type LucideIcon,
-} from "lucide-react"
+import { LayoutList } from "lucide-react"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { ReportSection } from "@/components/report-section"
+import { DualDataWidget } from "@/components/dual-data-widget"
+import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
 import {
   Table,
   TableBody,
@@ -28,14 +20,6 @@ import {
 } from "@/components/ui/tooltip"
 import { type ActiveFilters, getBookingProfile } from "@/lib/chart-data"
 
-
-type BookingMetric = {
-  label: string
-  value: string
-  icon: LucideIcon
-  description: string
-}
-
 const BASE_PARTNER_ROWS = [
   { brand: "Partner Alpha", ccy: "GBP", color: "bg-blue-500" },
   { brand: "Partner Beta", ccy: "GBP", color: "bg-cyan-500" },
@@ -47,7 +31,6 @@ const BASE_PARTNER_ROWS = [
   { brand: "Partner Zeta (EUR)", ccy: "EUR", color: "bg-orange-500" },
 ]
 
-// Per-row data keyed by partner:brand profile
 const ROW_DATA: Record<string, Array<{ bookings: string; cal: string; ddl: string }>> = {
   "all-partners:all-brands": [
     { bookings: "42,310", cal: "1,104 2.6%", ddl: "12 0.0%" },
@@ -99,38 +82,6 @@ export function getPartnerRows(filters: ActiveFilters) {
 
 export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
   const profile = getBookingProfile(filters)
-  const bookingMetrics: BookingMetric[] = [
-    {
-      label: "Total bookings",
-      value: profile.total,
-      icon: CalendarCheck,
-      description: "Total number of bookings across all selected partners and brands.",
-    },
-    {
-      label: "CAL sales",
-      value: profile.calSales,
-      icon: TrendingUp,
-      description: "Sales completed through the CAL payment method for the selected period.",
-    },
-    {
-      label: "CAL take-up %",
-      value: profile.calPct,
-      icon: Percent,
-      description: "Percentage of eligible bookings that converted to CAL sales.",
-    },
-    {
-      label: "DDL sales",
-      value: profile.ddlSales,
-      icon: CreditCard,
-      description: "Sales completed through direct debit (DDL) for the selected period.",
-    },
-    {
-      label: "DDL take-up %",
-      value: profile.ddlPct,
-      icon: Gauge,
-      description: "Percentage of eligible bookings that converted to DDL sales.",
-    },
-  ]
   const partnerRows = getPartnerRows(filters)
   const [showBreakdown, setShowBreakdown] = useState(false)
 
@@ -160,36 +111,27 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
           </Tooltip>
         }
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          {bookingMetrics.map(({ label, value, icon: Icon, description }) => (
-            <Card key={label}>
-              <CardHeader className="items-center">
-                <div className="flex items-center gap-2">
-                  <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
-                    <Icon className="size-3.5" />
-                  </div>
-                  <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                    {label}
-                  </p>
-                </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label={`More information about ${label}`}
-                    >
-                      <Info className="size-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{description}</TooltipContent>
-                </Tooltip>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl font-medium tracking-tight">{value}</p>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+          <HeadlineDataWidget
+            title="Total bookings"
+            value={profile.total}
+            label="All selected partners and brands"
+            helpText="Total number of bookings across all selected partners and brands."
+          />
+          <DualDataWidget
+            primaryTitle="Payment method split"
+            datasetA={{
+              title: "CAL sales",
+              value: profile.calSales,
+              clarification: `${profile.calPct} take-up`,
+            }}
+            datasetB={{
+              title: "DDL sales",
+              value: profile.ddlSales,
+              clarification: `${profile.ddlPct} take-up`,
+            }}
+            helpText="Compare CAL and DDL sales volume and conversion rates side by side."
+          />
         </div>
 
         {showBreakdown && (

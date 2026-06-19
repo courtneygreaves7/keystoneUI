@@ -1,8 +1,9 @@
 import { useState } from "react"
-import { FileText, Info, LayoutList, Percent, Wallet, type LucideIcon } from "lucide-react"
+import { LayoutList } from "lucide-react"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { DualDataWidget } from "@/components/dual-data-widget"
 import { ReportSection } from "@/components/report-section"
+import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
 import {
   Table,
   TableBody,
@@ -17,22 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 import { type ActiveFilters, getAbvProfile } from "@/lib/chart-data"
-
-type CurrencyColumn = {
-  currency: "GBP" | "EUR"
-  flag: "uk" | "eu"
-  value: string
-  cal: string
-}
-
-type CurrencyAbvMetric = {
-  label: string
-  icon: LucideIcon
-  description: string
-  columns: [CurrencyColumn, CurrencyColumn]
-}
 
 const BASE_ABV_ROWS = [
   { brand: "Partner Alpha",       ccy: "GBP", color: "bg-blue-500"   },
@@ -94,40 +80,10 @@ function getAbvRows(filters: ActiveFilters) {
   return BASE_ABV_ROWS.map((base, i) => ({ ...base, ...rowData[i] }))
 }
 
-function FlagBadge({ type }: { type: "uk" | "eu" }) {
-  const src = type === "uk" ? "https://flagcdn.com/w40/gb.png" : "https://flagcdn.com/w40/eu.png"
-  const alt = type === "uk" ? "United Kingdom flag" : "European Union flag"
-  return (
-    <span className="inline-flex size-4 overflow-hidden rounded-full border border-border/80 bg-background">
-      <img src={src} alt={alt} className="size-full object-cover" />
-    </span>
-  )
-}
-
 export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilters }) {
   const [showBreakdown, setShowBreakdown] = useState(false)
   const profile = getAbvProfile(filters)
   const abvRows = getAbvRows(filters)
-  const currencyAbvMetrics: CurrencyAbvMetric[] = [
-    {
-      label: "ABV (excl. booking fee)",
-      icon: Wallet,
-      description: "Average booking value excluding the booking fee.",
-      columns: [
-        { currency: "GBP", flag: "uk", value: profile.gbpAbv, cal: profile.gbpCal },
-        { currency: "EUR", flag: "eu", value: profile.eurAbv, cal: profile.eurCal },
-      ],
-    },
-    {
-      label: "ABV inc. booking fee",
-      icon: FileText,
-      description: "Average booking value including the booking fee.",
-      columns: [
-        { currency: "GBP", flag: "uk", value: profile.gbpAbvFee, cal: profile.gbpCalFee },
-        { currency: "EUR", flag: "eu", value: profile.eurAbvFee, cal: profile.eurCalFee },
-      ],
-    },
-  ]
 
   return (
     <TooltipProvider>
@@ -155,88 +111,41 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
           </Tooltip>
         }
       >
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-          {currencyAbvMetrics.map(({ label, icon: Icon, description, columns }) => (
-            <Card key={label}>
-              <CardHeader className="items-center">
-                <div className="flex items-center gap-2">
-                  <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
-                    <Icon className="size-3.5" />
-                  </div>
-                  <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                    {label}
-                  </p>
-                </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label={`More information about ${label}`}
-                    >
-                      <Info className="size-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{description}</TooltipContent>
-                </Tooltip>
-              </CardHeader>
-
-              <CardContent>
-                <div className="border-t border-border pt-4">
-                  <div className="grid grid-cols-2 divide-x divide-border">
-                    {columns.map((column, index) => (
-                      <div
-                        key={column.currency}
-                        className={cn("min-w-0 px-4", index === 0 && "pl-0", index === 1 && "pr-0")}
-                      >
-                        <div className="mb-1 flex items-center gap-1.5">
-                          <FlagBadge type={column.flag} />
-                          <span className="text-sm font-medium tracking-wide text-muted-foreground">
-                            {column.currency}
-                          </span>
-                        </div>
-                        <p className="text-xl font-medium tracking-tight">{column.value}</p>
-                        <p className="mt-1 text-[11px] font-normal text-primary">
-                          {column.cal}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          <Card>
-            <CardHeader className="items-center">
-              <div className="flex items-center gap-2">
-                <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
-                  <Percent className="size-3.5" />
-                </div>
-                <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                  CAL customer price
-                </p>
-              </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label="More information about CAL customer price"
-                  >
-                    <Info className="size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Share of customer price against ABV including booking fee.</TooltipContent>
-              </Tooltip>
-            </CardHeader>
-            <CardContent>
-              <div className="border-t border-border pt-4">
-                <p className="text-xl font-medium tracking-tight">{profile.calPct}</p>
-                <p className="mt-2 text-sm text-muted-foreground">% of ABV inc. booking fee</p>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <DualDataWidget
+            primaryTitle="ABV (excl. booking fee)"
+            datasetA={{
+              title: "GBP",
+              value: profile.gbpAbv,
+              clarification: profile.gbpCal,
+            }}
+            datasetB={{
+              title: "EUR",
+              value: profile.eurAbv,
+              clarification: profile.eurCal,
+            }}
+            helpText="Average booking value excluding the booking fee, with CAL ABV shown below each currency."
+          />
+          <DualDataWidget
+            primaryTitle="ABV inc. booking fee"
+            datasetA={{
+              title: "GBP",
+              value: profile.gbpAbvFee,
+              clarification: profile.gbpCalFee,
+            }}
+            datasetB={{
+              title: "EUR",
+              value: profile.eurAbvFee,
+              clarification: profile.eurCalFee,
+            }}
+            helpText="Average booking value including the booking fee, with CAL ABV shown below each currency."
+          />
+          <HeadlineDataWidget
+            title="CAL customer price"
+            value={profile.calPct}
+            label="% of ABV inc. booking fee"
+            helpText="Share of customer price against ABV including booking fee."
+          />
         </div>
 
         {showBreakdown && (

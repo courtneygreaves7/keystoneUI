@@ -19,21 +19,23 @@ export type DataSnapshotWidgetProps = {
 export function DataSnapshotWidget({
   title,
   rows,
-  overviewHref = "#",
+  overviewHref,
   overviewLabel = "Link to Overview",
   className,
 }: DataSnapshotWidgetProps) {
   return (
     <Card className={cn("bg-muted/30 shadow-xs", className)}>
-      <CardHeader className="pb-3">
+      <CardHeader className={cn("pb-3", !overviewHref && "flex-row items-center")}>
         <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
-        <a
-          href={overviewHref}
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          {overviewLabel}
-          <ArrowRight className="size-3" />
-        </a>
+        {overviewHref ? (
+          <a
+            href={overviewHref}
+            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {overviewLabel}
+            <ArrowRight className="size-3" />
+          </a>
+        ) : null}
       </CardHeader>
 
       <CardContent className="px-0 pb-0">

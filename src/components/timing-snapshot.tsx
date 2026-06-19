@@ -1,8 +1,9 @@
 import { useState } from "react"
-import { Clock, Info, LayoutList, Timer } from "lucide-react"
+import { LayoutList } from "lucide-react"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { DualDataWidget } from "@/components/dual-data-widget"
 import { ReportSection } from "@/components/report-section"
+import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
 import {
   Table,
   TableBody,
@@ -18,21 +19,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { type ActiveFilters, getTimingProfile } from "@/lib/chart-data"
-
-type CurrencyTiming = {
-  currency: "GBP" | "EUR"
-  flag: "uk" | "eu"
-  value: string
-  cal: string
-}
-
-type TimingCard = {
-  label: string
-  icon: typeof Clock
-  description: string
-  columns?: [CurrencyTiming, CurrencyTiming]
-  emptyNote?: string
-}
 
 const BASE_TIMING_ROWS = [
   { brand: "Partner Alpha",       ccy: "GBP", color: "bg-blue-500"   },
@@ -94,37 +80,10 @@ function getTimingRows(filters: ActiveFilters) {
   return BASE_TIMING_ROWS.map((base, i) => ({ ...base, ...rowData[i] }))
 }
 
-function FlagBadge({ type }: { type: "uk" | "eu" }) {
-  const src = type === "uk" ? "https://flagcdn.com/w40/gb.png" : "https://flagcdn.com/w40/eu.png"
-  const alt = type === "uk" ? "United Kingdom flag" : "European Union flag"
-  return (
-    <span className="inline-flex size-4 overflow-hidden rounded-full border border-border/80 bg-background">
-      <img src={src} alt={alt} className="size-full object-cover" />
-    </span>
-  )
-}
-
 export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
   const [showBreakdown, setShowBreakdown] = useState(false)
   const profile = getTimingProfile(filters)
   const timingRows = getTimingRows(filters)
-  const timingCards: TimingCard[] = [
-    {
-      label: "Avg booking to stay",
-      icon: Clock,
-      description: "Average number of days between booking date and stay start date.",
-      columns: [
-        { currency: "GBP", flag: "uk", value: profile.gbpDays, cal: profile.gbpCal },
-        { currency: "EUR", flag: "eu", value: profile.eurDays, cal: profile.eurCal },
-      ],
-    },
-    {
-      label: "Avg cancellation to stay",
-      icon: Timer,
-      description: "Average number of days between cancellation date and stay start date.",
-      emptyNote: "Days from cancellation to stay start",
-    },
-  ]
 
   return (
     <TooltipProvider>
@@ -152,61 +111,27 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
           </Tooltip>
         }
       >
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {timingCards.map(({ label, icon: Icon, description, columns, emptyNote }) => (
-            <Card key={label}>
-              <CardHeader className="items-center">
-                <div className="flex items-center gap-2">
-                  <div className="grid size-7 place-items-center rounded-md bg-muted text-muted-foreground">
-                    <Icon className="size-3.5" />
-                  </div>
-                  <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                    {label}
-                  </p>
-                </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label={`More information about ${label}`}
-                    >
-                      <Info className="size-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{description}</TooltipContent>
-                </Tooltip>
-              </CardHeader>
-
-              <CardContent>
-                <div className="border-t border-border pt-4">
-                  {columns ? (
-                    <div className="grid grid-cols-2 divide-x divide-border">
-                      {columns.map((col, i) => (
-                        <div key={col.currency} className={i === 0 ? "pr-4" : "pl-4"}>
-                          <div className="mb-1 flex items-center gap-1.5">
-                            <FlagBadge type={col.flag} />
-                            <span className="text-sm font-medium tracking-wide text-muted-foreground">
-                              {col.currency}
-                            </span>
-                          </div>
-                          <p className="text-xl font-medium tracking-tight">{col.value}</p>
-                          <p className="mt-1 text-[11px] font-normal text-primary">
-                            {col.cal}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-xl font-medium tracking-tight text-muted-foreground">—</p>
-                      <p className="mt-2 text-sm text-muted-foreground">{emptyNote}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,240px)]">
+          <DualDataWidget
+            primaryTitle="Avg booking to stay"
+            datasetA={{
+              title: "GBP",
+              value: profile.gbpDays,
+              clarification: profile.gbpCal,
+            }}
+            datasetB={{
+              title: "EUR",
+              value: profile.eurDays,
+              clarification: profile.eurCal,
+            }}
+            helpText="Average number of days between booking date and stay start date, with CAL average shown below."
+          />
+          <HeadlineDataWidget
+            title="Avg cancellation to stay"
+            value="—"
+            label="Days from cancellation to stay start"
+            helpText="Average number of days between cancellation date and stay start date."
+          />
         </div>
 
         {showBreakdown && (
