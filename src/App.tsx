@@ -8,7 +8,7 @@ import {
   Download,
   SquareChartGantt,
   ArrowLeftRight,
-  Component,
+  Palette,
   Zap,
   LogOut,
   MoonStar,
@@ -148,8 +148,8 @@ function App() {
                   className="w-full justify-center gap-2 bg-card"
                   onClick={() => setActiveSection("components")}
                 >
-                  <Component className="size-4 shrink-0" />
-                  Components
+                  <Palette className="size-4 shrink-0" />
+                  Design system
                 </Button>
                 {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav />}
                 <Button
@@ -207,13 +207,13 @@ function App() {
                     <button
                       type="button"
                       onClick={() => setActiveSection("components")}
-                      aria-label="Components"
+                      aria-label="Design system"
                       className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
                     >
-                      <Component className="size-4" />
+                      <Palette className="size-4" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>Components</TooltipContent>
+                  <TooltipContent>Design system</TooltipContent>
                 </Tooltip>
                 {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav collapsed />}
                 <button
@@ -248,7 +248,7 @@ function App() {
                     {activeSection === "booking-engine"
                       ? "Booking engine"
                       : activeSection === "components"
-                        ? "Components"
+                        ? "Design system"
                         : activeSection === "admin"
                           ? "Admin"
                           : insightsView === "compare"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { BookOpen, Layers, Search } from "lucide-react"
+import { BookOpen, Palette, Search } from "lucide-react"
 
 import { ComponentDocBlock, CodeBlock, DocCallout, PropsTable } from "@/components/components-doc/doc-primitives"
 import { Input } from "@/components/ui/input"
@@ -11,9 +11,20 @@ import {
   figureStyleTokens,
 } from "@/lib/components-catalog"
 import { componentsCatalogExtra } from "@/lib/components-catalog-extra"
+import {
+  colorPaletteTokens,
+  typographyScale,
+  typographyTokens,
+} from "@/lib/design-foundations"
 import { cn } from "@/lib/utils"
 
 const fullCatalog = [...componentsCatalog, ...componentsCatalogExtra]
+
+const referenceNavItems = [
+  { id: "color-palette", label: "Colour palette" },
+  { id: "typography", label: "Typography" },
+  { id: "design-tokens", label: "Design tokens" },
+]
 
 const navSections = [
   ...componentCategories.map((category) => ({
@@ -26,9 +37,25 @@ const navSections = [
   {
     id: "reference",
     title: "Reference",
-    items: [{ id: "design-tokens", label: "Design tokens" }],
+    items: referenceNavItems,
   },
 ].filter((section) => section.items.length > 0)
+
+const colorGroups = ["Brand", "Surface", "Action", "UI", "Semantic"] as const
+
+function ColorSwatch({ token }: { token: (typeof colorPaletteTokens)[number] }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-border">
+      <div className="h-14 w-full border-b border-border" style={{ backgroundColor: `var(${token.variable})` }} />
+      <div className="space-y-1 p-3">
+        <p className="text-sm font-medium">{token.name}</p>
+        <p className="font-mono text-[11px] text-muted-foreground">{token.variable}</p>
+        <p className="font-mono text-[11px] text-muted-foreground">{token.hex}</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">{token.usage}</p>
+      </div>
+    </div>
+  )
+}
 
 function TableOfContents({
   activeId,
@@ -49,10 +76,16 @@ function TableOfContents({
         >
           <button
             type="button"
-            onClick={() => onNavigate(section.id === "reference" ? "design-tokens" : section.id)}
+            onClick={() =>
+              onNavigate(
+                section.id === "reference" ? referenceNavItems[0].id : section.id
+              )
+            }
             className={cn(
               "mb-2 w-full rounded-md px-2 py-1 text-left text-[11px] font-semibold uppercase tracking-wider transition-colors hover:bg-accent hover:text-foreground",
-              activeId === section.id || (section.id === "reference" && activeId === "design-tokens")
+              activeId === section.id ||
+                (section.id === "reference" &&
+                  referenceNavItems.some((item) => item.id === activeId))
                 ? "text-foreground"
                 : "text-muted-foreground"
             )}
@@ -120,7 +153,7 @@ export function ComponentsPage() {
     const sections = [
       ...componentCategories.map((category) => category.id),
       ...fullCatalog.map((entry) => entry.id),
-      "design-tokens",
+      ...referenceNavItems.map((item) => item.id),
     ]
 
     const observer = new IntersectionObserver(
@@ -162,13 +195,13 @@ export function ComponentsPage() {
           <div className="min-w-0 flex-1 space-y-10">
             <header className="space-y-4 border-b border-border pb-8">
               <div className="flex h-9 items-center gap-2 text-sm text-muted-foreground">
-                <Layers className="size-4 shrink-0" />
+                <Palette className="size-4 shrink-0" />
                 <span>Keystone design system</span>
               </div>
-              <h1 className="text-3xl font-semibold tracking-tight leading-9">Components</h1>
+              <h1 className="text-3xl font-semibold tracking-tight leading-9">Design system</h1>
               <p className="max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-                A living library of every Keystone component — stored, documented, and refined here.
-                Each entry includes a live preview, props reference, usage example, and source file.
+                Colours, typography, tokens, and a living library of every Keystone component —
+                documented with live previews, props, usage examples, and source files.
               </p>
 
               <div className="relative max-w-md">
@@ -176,7 +209,7 @@ export function ComponentsPage() {
                 <Input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search components, props, or files…"
+                  placeholder="Search components, tokens, or files…"
                   className="pl-9"
                 />
               </div>
@@ -204,6 +237,111 @@ export function ComponentsPage() {
               </section>
             ))
           )}
+
+          <Separator />
+
+          <section id="color-palette" className="scroll-mt-24 space-y-8">
+            <div className="space-y-1">
+              <h2 className="text-xl font-semibold tracking-tight">Colour palette</h2>
+              <p className="text-sm text-muted-foreground">
+                CSS custom properties defined in <code className="text-xs">src/index.css</code>.
+                Swatches reflect the active theme (light or dark).
+              </p>
+            </div>
+
+            {colorGroups.map((group) => {
+              const tokens = colorPaletteTokens.filter((token) => token.group === group)
+              if (tokens.length === 0) return null
+
+              return (
+                <div key={group} className="space-y-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                    {group}
+                  </h3>
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {tokens.map((token) => (
+                      <ColorSwatch key={token.variable} token={token} />
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+
+            <CodeBlock
+              code={`/* Brand */
+--brand-pink: #ee2a7b;
+--brand-dark-blue: #243748;
+
+/* Surfaces */
+--background: #ffffff;
+--foreground: #18181b;
+
+/* Use in Tailwind */
+<div className="bg-background text-foreground border-border" />
+<div style={{ color: "var(--brand-pink)" }} />`}
+            />
+          </section>
+
+          <Separator />
+
+          <section id="typography" className="scroll-mt-24 space-y-8">
+            <div className="space-y-1">
+              <h2 className="text-xl font-semibold tracking-tight">Typography</h2>
+              <p className="text-sm text-muted-foreground">
+                Plus Jakarta Sans is the primary typeface across Keystone, loaded from Google Fonts.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-border p-6">
+              <p className="text-sm font-medium text-muted-foreground">Font family</p>
+              <p className="mt-2 text-4xl font-semibold tracking-tight">{typographyTokens.fontFamily}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {typographyTokens.fallback}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {typographyTokens.weights.map((weight) => (
+                  <span
+                    key={weight}
+                    className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium"
+                    style={{ fontWeight: weight }}
+                  >
+                    {weight}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {typographyScale.map((entry) => (
+                <div
+                  key={entry.name}
+                  className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className={entry.className}>{entry.sample}</p>
+                  </div>
+                  <div className="shrink-0 space-y-1 sm:max-w-xs sm:text-right">
+                    <p className="text-sm font-medium">{entry.name}</p>
+                    <p className="font-mono text-[11px] text-muted-foreground">{entry.className}</p>
+                    <p className="text-xs text-muted-foreground">{entry.specs}</p>
+                    <p className="text-xs text-muted-foreground">{entry.usage}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <CodeBlock
+              code={`/* index.css */
+@theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* index.html */
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" />
+
+import { FIGURE_20PX_CLASS, FIGURE_30PX_CLASS } from "@/lib/figure-styles"`}
+            />
+          </section>
 
           <Separator />
 
