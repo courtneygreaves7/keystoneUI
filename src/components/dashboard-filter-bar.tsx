@@ -39,7 +39,8 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
   const [year, setYear] = useState(filters.year)
   const [month, setMonth] = useState(filters.month)
   const [metric, setMetric] = useState(filters.metric)
-  const [sortBy, setSortBy] = useState(filters.sortBy)
+
+  const showBrand = partner !== "all-partners"
 
   useEffect(() => {
     setPartner(filters.partner)
@@ -48,11 +49,25 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
     setYear(filters.year)
     setMonth(filters.month)
     setMetric(filters.metric)
-    setSortBy(filters.sortBy)
   }, [filters])
 
+  function handlePartnerChange(value: string) {
+    setPartner(value)
+    if (value === "all-partners") {
+      setBrand("all-brands")
+    }
+  }
+
   function handleRun() {
-    onRun({ partner, brand, dateRange, year, month, metric, sortBy })
+    onRun({
+      partner,
+      brand: partner === "all-partners" ? "all-brands" : brand,
+      dateRange,
+      year,
+      month,
+      metric,
+      sortBy: filters.sortBy,
+    })
   }
 
   return (
@@ -69,7 +84,7 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
           <Label htmlFor="dash-partner" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
             Partner
           </Label>
-          <Select value={partner} onValueChange={setPartner}>
+          <Select value={partner} onValueChange={handlePartnerChange}>
             <SelectTrigger id="dash-partner" className="h-9 w-full">
               <SelectValue placeholder="Partner" />
             </SelectTrigger>
