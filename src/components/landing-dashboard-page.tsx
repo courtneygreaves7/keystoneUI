@@ -1,11 +1,15 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react"
 import {
   BarChart3,
   Building2,
   ChevronRight,
+  FileText,
+  GripVertical,
+  LayoutPanelTop,
   PencilLine,
   Plus,
   Users,
+  X,
   type LucideIcon,
 } from "lucide-react"
 
@@ -37,9 +41,181 @@ export type LandingDestination =
 type LandingDashboardPageProps = {
   filters: ActiveFilters
   onNavigate: (destination: LandingDestination) => void
+  isCustomising?: boolean
 }
 
 const PANEL_BORDER_CLASS = "border-border bg-card"
+const PANEL_CUSTOMISE_BORDER_CLASS = "border-2 border-dashed border-primary/50 bg-card"
+
+type DashboardCardId = "operations" | "intelligence" | "targets" | "team"
+
+const DEFAULT_CARD_ORDER: DashboardCardId[] = [
+  "operations",
+  "intelligence",
+  "targets",
+  "team",
+]
+
+const CARD_ORDER_STORAGE_KEY = "keystone-landing-card-order"
+
+/** Keep the team card height stable; only the member list scrolls beyond this. */
+const TEAM_LIST_MAX_HEIGHT_CLASS = "max-h-96"
+
+function getInitialCardOrder(): DashboardCardId[] {
+  try {
+    const stored = localStorage.getItem(CARD_ORDER_STORAGE_KEY)
+    if (!stored) return DEFAULT_CARD_ORDER
+
+    const parsed = JSON.parse(stored) as DashboardCardId[]
+    const isValid =
+      parsed.length === DEFAULT_CARD_ORDER.length &&
+      DEFAULT_CARD_ORDER.every((id) => parsed.includes(id))
+
+    return isValid ? parsed : DEFAULT_CARD_ORDER
+  } catch {
+    return DEFAULT_CARD_ORDER
+  }
+}
+
+function reorderCards(order: DashboardCardId[], fromIndex: number, toIndex: number) {
+  const next = [...order]
+  const [moved] = next.splice(fromIndex, 1)
+  next.splice(toIndex, 0, moved)
+  return next
+}
+
+function areCardsInSameRow(order: DashboardCardId[], a: DashboardCardId, b: DashboardCardId) {
+  const aIndex = order.indexOf(a)
+  const bIndex = order.indexOf(b)
+  if (aIndex < 0 || bIndex < 0) return false
+  return Math.floor(aIndex / 2) === Math.floor(bIndex / 2)
+}
+
+type DragHandleProps = HTMLAttributes<HTMLButtonElement>
+
+function CustomiseDashboardToast({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div
+      role="status"
+      className="pointer-events-auto fixed bottom-8 left-1/2 z-[60] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 animate-in fade-in slide-in-from-bottom-2 duration-300"
+    >
+      <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-white p-4 text-zinc-900 shadow-lg">
+        <LayoutPanelTop className="mt-0.5 size-5 shrink-0 text-primary" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold">Customise your dashboard</p>
+          <p className="mt-1 text-xs leading-relaxed text-zinc-600">
+            Drag Operations, Intelligence, Targets, and Team using the grip handles. Your
+            layout is saved automatically.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+          aria-label="Dismiss"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function DragHandleButton({
+  label,
+  dragHandleProps,
+}: {
+  label: string
+  dragHandleProps: DragHandleProps
+}) {
+  return (
+    <button
+      type="button"
+      {...dragHandleProps}
+      className={cn(
+        "mt-0.5 inline-flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground active:cursor-grabbing",
+        dragHandleProps.className
+      )}
+      aria-label={`Drag to reorder ${label}`}
+    >
+      <GripVertical className="size-4" />
+    </button>
+  )
+}
+
+function DraggableDashboardSlot({
+  cardId,
+  index,
+  enabled,
+  onReorder,
+  slotRef,
+  className,
+  style,
+  children,
+}: {
+  cardId: DashboardCardId
+  index: number
+  enabled: boolean
+  onReorder: (fromIndex: number, toIndex: number) => void
+  slotRef?: React.RefObject<HTMLDivElement | null>
+  className?: string
+  style?: React.CSSProperties
+  children: (dragHandleProps?: DragHandleProps) => ReactNode
+}) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [isDropTarget, setIsDropTarget] = useState(false)
+
+  const dragHandleProps: DragHandleProps = {
+    draggable: true,
+    onDragStart: (event) => {
+      event.dataTransfer.setData("text/dashboard-card-index", String(index))
+      event.dataTransfer.effectAllowed = "move"
+      setIsDragging(true)
+    },
+    onDragEnd: () => {
+      setIsDragging(false)
+      setIsDropTarget(false)
+    },
+  }
+
+  return (
+    <div
+      ref={slotRef}
+      data-card-id={cardId}
+      className={cn(
+        "min-w-0",
+        className,
+        enabled && isDragging && "ring-2 ring-primary/30",
+        enabled && isDropTarget && "rounded-xl ring-2 ring-primary/25 ring-offset-2 ring-offset-background"
+      )}
+      style={style}
+      onDragOver={
+        enabled
+          ? (event) => {
+              event.preventDefault()
+              event.dataTransfer.dropEffect = "move"
+              setIsDropTarget(true)
+            }
+          : undefined
+      }
+      onDragLeave={enabled ? () => setIsDropTarget(false) : undefined}
+      onDrop={
+        enabled
+          ? (event) => {
+              event.preventDefault()
+              const fromIndex = Number(event.dataTransfer.getData("text/dashboard-card-index"))
+              if (!Number.isNaN(fromIndex) && fromIndex !== index) {
+                onReorder(fromIndex, index)
+              }
+              setIsDropTarget(false)
+            }
+          : undefined
+      }
+    >
+      {children(enabled ? dragHandleProps : undefined)}
+    </div>
+  )
+}
 
 type TeamWorkStatus = "in_progress" | "completed" | "in_review" | "blocked"
 
@@ -108,6 +284,46 @@ const TEAM_MEMBERS: TeamMember[] = [
     online: true,
     lastWorkedOn: "YTD target adjustments",
     status: "blocked",
+  },
+  {
+    id: "liam",
+    name: "Liam Okonkwo",
+    initials: "LO",
+    online: true,
+    lastWorkedOn: "EUR rate card updates",
+    status: "in_progress",
+  },
+  {
+    id: "rachel",
+    name: "Rachel Kim",
+    initials: "RK",
+    online: false,
+    lastWorkedOn: "Cancellation trend report",
+    status: "completed",
+  },
+  {
+    id: "david",
+    name: "David Park",
+    initials: "DP",
+    online: true,
+    lastWorkedOn: "Property mapping QA",
+    status: "in_review",
+  },
+  {
+    id: "nina",
+    name: "Nina Hoffmann",
+    initials: "NH",
+    online: false,
+    lastWorkedOn: "Partner Delta compliance check",
+    status: "in_progress",
+  },
+  {
+    id: "alex",
+    name: "Alex Rivera",
+    initials: "AR",
+    online: true,
+    lastWorkedOn: "Weekly bookings summary",
+    status: "completed",
   },
 ]
 
@@ -252,9 +468,11 @@ function DashboardPanel({
   onLinkClick,
   headerAction,
   headerAccentColors,
+  dragHandleProps,
   children,
   className,
   variant = "fill",
+  customiseMode = false,
 }: {
   label: string
   subtitle: string
@@ -262,9 +480,11 @@ function DashboardPanel({
   onLinkClick?: () => void
   headerAction?: React.ReactNode
   headerAccentColors?: string[]
+  dragHandleProps?: DragHandleProps
   children?: React.ReactNode
   className?: string
   variant?: "fill" | "compact"
+  customiseMode?: boolean
 }) {
   const hasBody = children != null
 
@@ -273,12 +493,15 @@ function DashboardPanel({
       className={cn(
         "flex flex-col overflow-hidden rounded-xl border shadow-xs",
         variant === "fill" && hasBody ? "h-full min-h-0" : "",
-        PANEL_BORDER_CLASS,
+        customiseMode ? PANEL_CUSTOMISE_BORDER_CLASS : PANEL_BORDER_CLASS,
         className
       )}
     >
       <header className="flex items-start justify-between gap-4 px-5 py-4">
         <div className="flex min-w-0 flex-1 items-stretch gap-3">
+          {dragHandleProps ? (
+            <DragHandleButton label={label} dragHandleProps={dragHandleProps} />
+          ) : null}
           {headerAccentColors?.length ? (
             <PanelHeaderAccent colors={headerAccentColors} />
           ) : null}
@@ -314,32 +537,253 @@ function DashboardPanel({
   )
 }
 
-export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPageProps) {
+export function LandingDashboardPage({
+  filters,
+  onNavigate,
+  isCustomising = false,
+}: LandingDashboardPageProps) {
   const booking = getBookingProfile(filters)
   const productSplit = getProductSplit(booking)
   const bookingTrend = deriveBookingTrendMeta(booking.total)
   const bookingChart = buildBookingTrendChart(booking.total)
   const snapshotPartner = BOOKING_ENGINE_PARTNERS[0]
-  const intelRef = useRef<HTMLDivElement>(null)
-  const [intelHeight, setIntelHeight] = useState<number>()
+  const [cardOrder, setCardOrder] = useState<DashboardCardId[]>(getInitialCardOrder)
+  const intelligenceRef = useRef<HTMLDivElement>(null)
+  const targetsRef = useRef<HTMLDivElement>(null)
+  const [intelligenceHeight, setIntelligenceHeight] = useState<number>()
+  const [targetsHeight, setTargetsHeight] = useState<number>()
+  const [showCustomiseToast, setShowCustomiseToast] = useState(false)
+
+  const handleCardReorder = useCallback((fromIndex: number, toIndex: number) => {
+    setCardOrder((current) => {
+      const next = reorderCards(current, fromIndex, toIndex)
+      localStorage.setItem(CARD_ORDER_STORAGE_KEY, JSON.stringify(next))
+      return next
+    })
+  }, [])
 
   useEffect(() => {
-    const element = intelRef.current
-    if (!element) return
+    if (!isCustomising) {
+      setShowCustomiseToast(false)
+      return
+    }
+
+    setShowCustomiseToast(true)
+  }, [isCustomising])
+
+  useEffect(() => {
+    const element = intelligenceRef.current
+    if (!element) {
+      setIntelligenceHeight(undefined)
+      return
+    }
 
     const updateHeight = () => {
-      setIntelHeight(element.getBoundingClientRect().height)
+      const height = element.getBoundingClientRect().height
+      if (height > 0) {
+        setIntelligenceHeight(height)
+      }
     }
 
     updateHeight()
     const observer = new ResizeObserver(updateHeight)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [cardOrder, booking.total])
+
+  useEffect(() => {
+    const element = targetsRef.current
+    if (!element) {
+      setTargetsHeight(undefined)
+      return
+    }
+
+    const updateHeight = () => {
+      const height = element.getBoundingClientRect().height
+      if (height > 0) {
+        setTargetsHeight(height)
+      }
+    }
+
+    updateHeight()
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [cardOrder])
+
+  const syncOpsWithIntel = areCardsInSameRow(cardOrder, "operations", "intelligence")
+  const syncTeamWithTargets = areCardsInSameRow(cardOrder, "targets", "team")
+
+  function renderDashboardCard(cardId: DashboardCardId, dragHandleProps?: DragHandleProps) {
+    switch (cardId) {
+      case "operations":
+        return (
+          <DashboardPanel
+            className={syncOpsWithIntel ? "h-full" : undefined}
+            variant={syncOpsWithIntel ? "fill" : "compact"}
+            customiseMode={isCustomising}
+            label="Operations"
+            subtitle="Partners, policies & connectivity"
+            headerAccentColors={["bg-green-500"]}
+            linkLabel="Manage"
+            onLinkClick={() => onNavigate({ section: "booking-engine" })}
+            dragHandleProps={dragHandleProps}
+          >
+            <div className={cn(syncOpsWithIntel && "flex min-h-0 flex-1 flex-col")}>
+              <div className="grid grid-cols-3 gap-2">
+                <OpsActionButton
+                  label="View partners"
+                  icon={Users}
+                  onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
+                />
+                <OpsActionButton
+                  label="View properties"
+                  icon={Building2}
+                  onClick={() => onNavigate({ section: "booking-engine", view: "properties" })}
+                />
+                <OpsActionButton
+                  label="Editor mode"
+                  icon={PencilLine}
+                  onClick={() => onNavigate({ section: "booking-engine", view: "editor" })}
+                />
+              </div>
+
+              {snapshotPartner ? (
+                <div
+                  className={cn(
+                    "mt-4 -mx-5 overflow-hidden px-5",
+                    syncOpsWithIntel ? "-mb-4 flex min-h-0 flex-1 flex-col" : "-mb-4"
+                  )}
+                >
+                  <ScaledPartnerPanelPreview
+                    partner={snapshotPartner}
+                    className={syncOpsWithIntel ? "min-h-0 flex-1" : "h-48"}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </DashboardPanel>
+        )
+
+      case "intelligence":
+        return (
+          <DashboardPanel
+            variant="compact"
+            customiseMode={isCustomising}
+            label="Intelligence"
+            subtitle="Insights, trends & benchmarks"
+            headerAccentColors={["bg-purple-500"]}
+            linkLabel="Full report"
+            onLinkClick={() => onNavigate({ section: "insights" })}
+            dragHandleProps={dragHandleProps}
+          >
+            <div className="@container flex min-h-0 flex-1 flex-col gap-4">
+              <div className={cn(metricCardGridClass, "min-w-0 grid-cols-2")}>
+                <MetricTrendWidget
+                  className="min-w-0"
+                  title="Total bookings"
+                  value={booking.total}
+                  trendLabel={bookingTrend.trendLabel}
+                  trend={bookingTrend.trend}
+                  comparisonLabel={bookingTrend.comparisonLabel}
+                  chartData={bookingChart}
+                  scopeLabel="All selected partners and brands"
+                  rateLabel={bookingTrend.dailyAverage}
+                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
+                />
+                <ProductSplitWidget
+                  className="min-w-0"
+                  totalLabel={productSplit.totalLabel}
+                  segmentA={{
+                    label: "CAL",
+                    value: booking.calSales,
+                    sharePercent: productSplit.calSharePercent,
+                    takeUpLabel: booking.calPct,
+                    trend: productSplit.calTrend,
+                  }}
+                  segmentB={{
+                    label: "DDL",
+                    value: booking.ddlSales,
+                    sharePercent: productSplit.ddlSharePercent,
+                    takeUpLabel: booking.ddlPct,
+                    trend: productSplit.ddlTrend,
+                  }}
+                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
+                />
+              </div>
+
+              <p className="mt-auto border-t border-border/50 pt-3 text-xs text-muted-foreground">
+                Explore timing, ABV, lead time and more in the{" "}
+                <button
+                  type="button"
+                  onClick={() => onNavigate({ section: "insights" })}
+                  className="font-medium text-foreground underline-offset-2 hover:underline"
+                >
+                  full insights report
+                </button>
+                .
+              </p>
+            </div>
+          </DashboardPanel>
+        )
+
+      case "targets":
+        return (
+          <DashboardPanel
+            variant="compact"
+            customiseMode={isCustomising}
+            label="Targets"
+            subtitle="Progress against this period's goals"
+            headerAccentColors={["bg-rose-500"]}
+            linkLabel="Manage targets"
+            onLinkClick={() => onNavigate({ section: "insights" })}
+            dragHandleProps={dragHandleProps}
+          >
+            <TargetsSnapshot />
+          </DashboardPanel>
+        )
+
+      case "team":
+        return (
+          <DashboardPanel
+            className={syncTeamWithTargets ? "h-full" : undefined}
+            variant={syncTeamWithTargets ? "fill" : "compact"}
+            customiseMode={isCustomising}
+            label="Team"
+            subtitle="Who's working on what"
+            headerAccentColors={["bg-indigo-500"]}
+            dragHandleProps={dragHandleProps}
+            headerAction={
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                  <FileText className="size-3.5" />
+                  Generate report
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                  <Plus className="size-3.5" />
+                  Add team member
+                </Button>
+              </div>
+            }
+          >
+            <ul
+              className={cn(
+                "divide-y divide-border overflow-y-auto",
+                syncTeamWithTargets ? "min-h-0 flex-1" : TEAM_LIST_MAX_HEIGHT_CLASS
+              )}
+            >
+              {TEAM_MEMBERS.map((member) => (
+                <TeamMemberRow key={member.id} member={member} />
+              ))}
+            </ul>
+          </DashboardPanel>
+        )
+    }
+  }
 
   return (
     <TooltipProvider>
-    <div className="flex min-h-full flex-col gap-5">
+    <div className="relative flex min-h-full flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-[22px] font-semibold tracking-tight">Welcome back, Courtney</h1>
@@ -354,144 +798,46 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <div className="flex items-start gap-3">
-        {/* Operations */}
-        <div
-          className="min-w-0 flex-1"
-          style={intelHeight !== undefined ? { height: intelHeight } : undefined}
-        >
-        <DashboardPanel
-          className="h-full"
-          variant="fill"
-          label="Operations"
-          subtitle="Partners, policies & connectivity"
-          headerAccentColors={["bg-green-500"]}
-          linkLabel="Manage"
-          onLinkClick={() => onNavigate({ section: "booking-engine" })}
-        >
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="grid grid-cols-3 gap-2">
-              <OpsActionButton
-                label="View partners"
-                icon={Users}
-                onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
-              />
-              <OpsActionButton
-                label="View properties"
-                icon={Building2}
-                onClick={() => onNavigate({ section: "booking-engine", view: "properties" })}
-              />
-              <OpsActionButton
-                label="Editor mode"
-                icon={PencilLine}
-                onClick={() => onNavigate({ section: "booking-engine", view: "editor" })}
-              />
-            </div>
+      <div className="grid grid-cols-2 items-start gap-3">
+        {cardOrder.map((cardId, index) => (
+          <DraggableDashboardSlot
+            key={cardId}
+            cardId={cardId}
+            index={index}
+            enabled={isCustomising}
+            onReorder={handleCardReorder}
+            slotRef={
+              cardId === "intelligence"
+                ? intelligenceRef
+                : cardId === "targets"
+                  ? targetsRef
+                  : undefined
+            }
+            className={cn(
+              cardId === "operations" && syncOpsWithIntel && "w-full",
+              cardId === "team" && syncTeamWithTargets && "w-full",
+              cardId === "team" && !syncTeamWithTargets && "self-start"
+            )}
+            style={
+              cardId === "operations" &&
+              syncOpsWithIntel &&
+              intelligenceHeight !== undefined &&
+              intelligenceHeight > 0
+                ? { height: intelligenceHeight }
+                : cardId === "team" &&
+                    syncTeamWithTargets &&
+                    targetsHeight !== undefined &&
+                    targetsHeight > 0
+                  ? { height: targetsHeight }
+                  : undefined
+            }
+          >
+            {(dragHandleProps) => renderDashboardCard(cardId, dragHandleProps)}
+          </DraggableDashboardSlot>
+        ))}
+      </div>
 
-            {snapshotPartner ? (
-              <div className="mt-4 -mx-5 -mb-4 flex min-h-0 flex-1 flex-col overflow-hidden px-5">
-                <ScaledPartnerPanelPreview partner={snapshotPartner} className="min-h-0 flex-1" />
-              </div>
-            ) : null}
-          </div>
-        </DashboardPanel>
-        </div>
-
-        {/* Intelligence */}
-        <div ref={intelRef} className="min-w-0 flex-1">
-        <DashboardPanel
-          variant="compact"
-          label="Intelligence"
-          subtitle="Insights, trends & benchmarks"
-          headerAccentColors={["bg-purple-500"]}
-          linkLabel="Full report"
-          onLinkClick={() => onNavigate({ section: "insights" })}
-        >
-          <div className="@container flex min-h-0 flex-1 flex-col gap-4">
-            <div className={cn(metricCardGridClass, "min-w-0 grid-cols-2")}>
-              <MetricTrendWidget
-                className="min-w-0"
-                title="Total bookings"
-                value={booking.total}
-                trendLabel={bookingTrend.trendLabel}
-                trend={bookingTrend.trend}
-                comparisonLabel={bookingTrend.comparisonLabel}
-                chartData={bookingChart}
-                scopeLabel="All selected partners and brands"
-                rateLabel={bookingTrend.dailyAverage}
-                helpText={INSIGHTS_WIDGET_HELP_TEXT}
-              />
-              <ProductSplitWidget
-                className="min-w-0"
-                totalLabel={productSplit.totalLabel}
-                segmentA={{
-                  label: "CAL",
-                  value: booking.calSales,
-                  sharePercent: productSplit.calSharePercent,
-                  takeUpLabel: `${booking.calPct} take-up`,
-                  trend: productSplit.calTrend,
-                }}
-                segmentB={{
-                  label: "DDL",
-                  value: booking.ddlSales,
-                  sharePercent: productSplit.ddlSharePercent,
-                  takeUpLabel: `${booking.ddlPct} take-up`,
-                  trend: productSplit.ddlTrend,
-                }}
-                helpText={INSIGHTS_WIDGET_HELP_TEXT}
-              />
-            </div>
-
-            <p className="mt-auto border-t border-border/50 pt-3 text-xs text-muted-foreground">
-              Explore timing, ABV, lead time and more in the{" "}
-              <button
-                type="button"
-                onClick={() => onNavigate({ section: "insights" })}
-                className="font-medium text-foreground underline-offset-2 hover:underline"
-              >
-                full insights report
-              </button>
-              .
-            </p>
-          </div>
-        </DashboardPanel>
-        </div>
-        </div>
-
-        <div className="grid grid-cols-8 items-stretch gap-3">
-        <DashboardPanel
-          className="col-span-4"
-          label="Targets"
-          subtitle="Progress against this period's goals"
-          headerAccentColors={["bg-rose-500"]}
-          linkLabel="Manage targets"
-          onLinkClick={() => onNavigate({ section: "insights" })}
-        >
-          <TargetsSnapshot />
-        </DashboardPanel>
-
-        <DashboardPanel
-          className="col-span-4"
-          label="Team"
-          subtitle="Who's working on what"
-          headerAccentColors={["bg-indigo-500"]}
-          headerAction={
-            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-              <Plus className="size-3.5" />
-              Add team member
-            </Button>
-          }
-        >
-          <ul className="divide-y divide-border">
-            {TEAM_MEMBERS.map((member) => (
-              <TeamMemberRow key={member.id} member={member} />
-            ))}
-          </ul>
-        </DashboardPanel>
-        </div>
-
-        <div className="grid grid-cols-8 items-stretch gap-3">
+      <div className="grid grid-cols-8 items-stretch gap-3">
         <DashboardPanel
           className="col-span-8"
           label="Admin"
@@ -512,9 +858,12 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
             ))}
           </ul>
         </DashboardPanel>
-        </div>
       </div>
     </div>
+
+    {isCustomising && showCustomiseToast ? (
+      <CustomiseDashboardToast onDismiss={() => setShowCustomiseToast(false)} />
+    ) : null}
     </TooltipProvider>
   )
 }

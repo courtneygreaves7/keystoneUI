@@ -4,6 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LayoutDashboard,
+  LayoutPanelTop,
   SquareChartGantt,
   Palette,
   Zap,
@@ -156,12 +157,16 @@ function App() {
   const [insightsScrollTarget, setInsightsScrollTarget] = useState<string | null>(null)
   const [bookingEngineView, setBookingEngineView] = useState<BookingEngineView>("partners")
   const [bookingEngineNavigationKey, setBookingEngineNavigationKey] = useState(0)
+  const [isCustomisingDashboard, setIsCustomisingDashboard] = useState(false)
 
   function handleLogout() {
     setIsAuthenticated(false)
   }
 
   function handleSectionSelect(section: ActiveSection) {
+    if (section !== "home") {
+      setIsCustomisingDashboard(false)
+    }
     if (section === "booking-engine" && activeSection !== "booking-engine") {
       setBookingEngineView("partners")
       setBookingEngineNavigationKey((key) => key + 1)
@@ -378,6 +383,18 @@ function App() {
             </Breadcrumb>
 
             <div className="flex items-center gap-2">
+              {activeSection === "home" ? (
+                <Button
+                  variant={isCustomisingDashboard ? "default" : "outline"}
+                  size="sm"
+                  className="h-9 gap-2"
+                  onClick={() => setIsCustomisingDashboard((value) => !value)}
+                >
+                  <LayoutPanelTop className="size-4" />
+                  Customise dashboard
+                </Button>
+              ) : null}
+
               <Button
                 variant="outline"
                 size="icon"
@@ -437,11 +454,19 @@ function App() {
             ) : (
               <>
                 <div className="min-h-0 min-w-0 overflow-hidden">
-                  <section className="h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14">
+                  <section
+                    className={cn(
+                      "relative h-full min-h-0 px-20 xl:px-24",
+                      activeSection === "booking-engine"
+                        ? "flex flex-col overflow-hidden py-8 xl:py-10"
+                        : "overflow-y-auto py-12 xl:py-14"
+                    )}
+                  >
                     {activeSection === "home" ? (
                       <LandingDashboardPage
                         filters={activeFilters}
                         onNavigate={handleLandingNavigate}
+                        isCustomising={isCustomisingDashboard}
                       />
                     ) : activeSection === "booking-engine" ? (
                       <BookingEnginePage

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 type PropertiesTableProps = {
   properties: PropertyListItem[]
   onViewProperty: (propertyId: string) => void
+  embedded?: boolean
 }
 
 function CountryBadge({ country }: { country: string }) {
@@ -31,60 +32,80 @@ function PostcodeCell({ postcode }: { postcode: string }) {
   )
 }
 
-export function PropertiesTable({ properties, onViewProperty }: PropertiesTableProps) {
+export function PropertiesTable({
+  properties,
+  onViewProperty,
+  embedded = false,
+}: PropertiesTableProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border">
+    <div className="overflow-hidden rounded-lg border border-border">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/30 hover:bg-muted/30">
-            <TableHead className="h-12 px-5">Code</TableHead>
-            <TableHead className="px-5">Name</TableHead>
-            <TableHead className="px-5">Partner / brand</TableHead>
-            <TableHead className="px-5">External ID</TableHead>
-            <TableHead className="px-5">Postcode</TableHead>
-            <TableHead className="px-5">Country</TableHead>
-            <TableHead className="px-5 text-right">Max occ.</TableHead>
-            <TableHead className="px-5 text-right">Bookings</TableHead>
-            <TableHead className="px-5 text-right" />
+            <TableHead className="h-10 px-4 text-xs">Code</TableHead>
+            <TableHead className="px-4 text-xs">Name</TableHead>
+            <TableHead className="px-4 text-xs">{embedded ? "Brand" : "Partner / brand"}</TableHead>
+            <TableHead className="px-4 text-xs">External ID</TableHead>
+            <TableHead className="px-4 text-xs">Postcode</TableHead>
+            <TableHead className="px-4 text-xs">Country</TableHead>
+            <TableHead className="px-4 text-right text-xs">Max occ.</TableHead>
+            <TableHead className="px-4 text-right text-xs">Bookings</TableHead>
+            {!embedded ? <TableHead className="px-4 text-right text-xs" /> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
           {properties.map((property) => (
-            <TableRow key={property.code}>
-              <TableCell className="px-5 py-4 text-sm tabular-nums">{property.code}</TableCell>
-              <TableCell className="px-5 py-4 text-sm">
+            <TableRow
+              key={property.code}
+              className={embedded && property.propertyId ? "cursor-pointer hover:bg-muted/30" : undefined}
+              onClick={
+                embedded && property.propertyId
+                  ? () => onViewProperty(property.propertyId!)
+                  : undefined
+              }
+            >
+              <TableCell className="px-4 py-3 text-sm tabular-nums">{property.code}</TableCell>
+              <TableCell className="px-4 py-3 text-sm">
                 {property.name ?? <span className="text-muted-foreground">—</span>}
               </TableCell>
-              <TableCell className="px-5 py-4 text-sm">
-                {property.partner}
-                <span className="text-muted-foreground"> · {property.brand}</span>
+              <TableCell className="px-4 py-3 text-sm">
+                {embedded ? (
+                  <span className="text-muted-foreground">{property.brand}</span>
+                ) : (
+                  <>
+                    {property.partner}
+                    <span className="text-muted-foreground"> · {property.brand}</span>
+                  </>
+                )}
               </TableCell>
-              <TableCell className="px-5 py-4 font-mono text-xs text-muted-foreground">
+              <TableCell className="px-4 py-3 font-mono text-xs text-muted-foreground">
                 {property.externalId}
               </TableCell>
-              <TableCell className="px-5 py-4">
+              <TableCell className="px-4 py-3">
                 <PostcodeCell postcode={property.postcode} />
               </TableCell>
-              <TableCell className="px-5 py-4">
+              <TableCell className="px-4 py-3">
                 <CountryBadge country={property.country} />
               </TableCell>
-              <TableCell className="px-5 py-4 text-right text-sm tabular-nums">
+              <TableCell className="px-4 py-3 text-right text-sm tabular-nums">
                 {property.maxOccupancy}
               </TableCell>
-              <TableCell className="px-5 py-4 text-right text-sm tabular-nums">
+              <TableCell className="px-4 py-3 text-right text-sm tabular-nums">
                 {property.bookings}
               </TableCell>
-              <TableCell className="px-5 py-4 text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  disabled={!property.propertyId}
-                  onClick={() => property.propertyId && onViewProperty(property.propertyId)}
-                >
-                  View
-                </Button>
-              </TableCell>
+              {!embedded ? (
+                <TableCell className="px-4 py-3 text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    disabled={!property.propertyId}
+                    onClick={() => property.propertyId && onViewProperty(property.propertyId)}
+                  >
+                    View
+                  </Button>
+                </TableCell>
+              ) : null}
             </TableRow>
           ))}
         </TableBody>
