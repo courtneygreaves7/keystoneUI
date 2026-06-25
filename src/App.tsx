@@ -254,19 +254,14 @@ function App() {
               </div>
 
               <div className="relative z-30 mt-auto shrink-0 space-y-4 overflow-visible px-5 pb-6 pt-4">
-                <div>
-                  <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-                    Development
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-center gap-2 bg-card"
-                    onClick={() => setActiveSection("components")}
-                  >
-                    <Palette className="size-4 shrink-0" />
-                    Design system
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  className="w-full justify-center gap-2 bg-card"
+                  onClick={() => setActiveSection("components")}
+                >
+                  <Palette className="size-4 shrink-0" />
+                  Design system
+                </Button>
                 {activeSection === "insights" && <SectionNav />}
                 <Button
                   variant="outline"

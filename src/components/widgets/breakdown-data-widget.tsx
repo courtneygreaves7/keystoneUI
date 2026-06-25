@@ -15,6 +15,7 @@ export type BreakdownDataWidgetProps = {
   primaryLabel: string
   subdataA: BreakdownSubdata
   subdataB: BreakdownSubdata
+  subdataDivider?: boolean
 }
 
 function SubdataBlock({ label, value, helpText }: BreakdownSubdata) {
@@ -35,6 +36,7 @@ export function BreakdownDataWidget({
   primaryLabel,
   subdataA,
   subdataB,
+  subdataDivider = false,
 }: BreakdownDataWidgetProps) {
   return (
     <Card className="bg-card shadow-xs">
@@ -49,7 +51,13 @@ export function BreakdownDataWidget({
 
         <div className="flex flex-col justify-center gap-5 border-border sm:border-l sm:pl-6">
           <SubdataBlock {...subdataA} />
-          <SubdataBlock {...subdataB} />
+          {subdataDivider ? (
+            <div className="border-t border-border pt-5">
+              <SubdataBlock {...subdataB} />
+            </div>
+          ) : (
+            <SubdataBlock {...subdataB} />
+          )}
         </div>
       </CardContent>
     </Card>

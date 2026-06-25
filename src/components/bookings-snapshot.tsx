@@ -91,7 +91,7 @@ function parsePercent(value: string) {
   return match ? Number.parseFloat(match[0]) : 0
 }
 
-function getProductSplit(profile: ReturnType<typeof getBookingProfile>) {
+export function getProductSplit(profile: ReturnType<typeof getBookingProfile>) {
   const calCount = parseCount(profile.calSales)
   const ddlCount = parseCount(profile.ddlSales)
   const splitTotal = calCount + ddlCount
