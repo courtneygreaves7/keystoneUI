@@ -1,6 +1,8 @@
-import { useId } from "react"
+import { useId, useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Area, AreaChart, Cell, Pie, PieChart, ResponsiveContainer, XAxis } from "recharts"
 
+import { Button } from "@/components/ui/button"
 import {
   getOverallTargetAchievement,
   getTargetAchievementPercent,
@@ -14,6 +16,19 @@ import { FIGURE_24PX_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
+
+const TARGET_SLIDES = [
+  {
+    id: "overall",
+    title: "Overall progress",
+    subtitle: "YTD achievement across all targets",
+  },
+  {
+    id: "breakdown",
+    title: "Target breakdown",
+    subtitle: "Actual vs goal by metric",
+  },
+] as const
 
 function TargetDonut({ percent }: { percent: number }) {
   const achieved = Math.min(100, Math.max(0, percent))
@@ -82,68 +97,128 @@ function TargetBreakdownRow({ target }: { target: LandingTarget }) {
   )
 }
 
-export function TargetsSnapshot() {
-  const gradientId = `target-progress-fill-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`
+function OverallProgressSlide({ gradientId }: { gradientId: string }) {
   const overallPercent = getOverallTargetAchievement(LANDING_TARGETS)
 
   return (
-    <div className="grid min-h-0 flex-1 gap-4 @md:grid-cols-2">
-      <div className="flex min-h-0 flex-col rounded-xl border border-border bg-card shadow-xs">
-        <div className="shrink-0 border-b border-border px-4 py-2.5">
-          <p className="text-xs font-semibold text-foreground">Overall progress</p>
-          <p className="text-[11px] text-muted-foreground">YTD achievement across all targets</p>
+    <div className="flex min-h-0 flex-1 flex-col gap-3 p-4">
+      <TargetDonut percent={overallPercent} />
+      <div className="h-20 w-full min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={LANDING_TARGET_PROGRESS_CHART}
+            margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={TICK_STYLE}
+              interval={0}
+              dy={4}
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="var(--foreground)"
+              strokeWidth={1.5}
+              strokeOpacity={0.55}
+              fill={`url(#${gradientId})`}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="text-center text-[11px] text-muted-foreground">
+        Cumulative achievement by month
+      </p>
+    </div>
+  )
+}
+
+function TargetBreakdownSlide() {
+  return (
+    <ul className="divide-y divide-border px-4">
+      {LANDING_TARGETS.map((target) => (
+        <TargetBreakdownRow key={target.id} target={target} />
+      ))}
+    </ul>
+  )
+}
+
+export function TargetsSnapshot() {
+  const gradientId = `target-progress-fill-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`
+  const [slideIndex, setSlideIndex] = useState(0)
+  const currentSlide = TARGET_SLIDES[slideIndex]
+
+  function goPrev() {
+    setSlideIndex((index) => (index === 0 ? TARGET_SLIDES.length - 1 : index - 1))
+  }
+
+  function goNext() {
+    setSlideIndex((index) => (index === TARGET_SLIDES.length - 1 ? 0 : index + 1))
+  }
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <div className="flex shrink-0 items-center gap-2 border-b border-border px-3 py-2.5">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7 shrink-0"
+          onClick={goPrev}
+          aria-label="Previous target view"
+        >
+          <ChevronLeft className="size-3.5" />
+        </Button>
+
+        <div className="min-w-0 flex-1 text-center">
+          <p className="truncate text-xs font-semibold text-foreground">{currentSlide.title}</p>
+          <p className="truncate text-[11px] text-muted-foreground">{currentSlide.subtitle}</p>
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-3 p-4">
-          <TargetDonut percent={overallPercent} />
-          <div className="h-20 w-full min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={LANDING_TARGET_PROGRESS_CHART}
-                margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
-                    <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="label"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={TICK_STYLE}
-                  interval={0}
-                  dy={4}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="var(--foreground)"
-                  strokeWidth={1.5}
-                  strokeOpacity={0.55}
-                  fill={`url(#${gradientId})`}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-center text-[11px] text-muted-foreground">
-            Cumulative achievement by month
-          </p>
-        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7 shrink-0"
+          onClick={goNext}
+          aria-label="Next target view"
+        >
+          <ChevronRight className="size-3.5" />
+        </Button>
       </div>
 
-      <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
-        <div className="shrink-0 border-b border-border px-4 py-2.5">
-          <p className="text-xs font-semibold text-foreground">Target breakdown</p>
-          <p className="text-[11px] text-muted-foreground">Actual vs goal by metric</p>
-        </div>
-        <ul className="divide-y divide-border px-4">
-          {LANDING_TARGETS.map((target) => (
-            <TargetBreakdownRow key={target.id} target={target} />
-          ))}
-        </ul>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {currentSlide.id === "overall" ? (
+          <OverallProgressSlide gradientId={gradientId} />
+        ) : (
+          <TargetBreakdownSlide />
+        )}
+      </div>
+
+      <div className="flex shrink-0 items-center justify-center gap-1.5 border-t border-border py-2.5">
+        {TARGET_SLIDES.map((slide, index) => (
+          <button
+            key={slide.id}
+            type="button"
+            onClick={() => setSlideIndex(index)}
+            className={cn(
+              "size-1.5 rounded-full transition-colors",
+              index === slideIndex ? "bg-foreground" : "bg-muted-foreground/35 hover:bg-muted-foreground/55"
+            )}
+            aria-label={`Show ${slide.title}`}
+            aria-current={index === slideIndex ? "true" : undefined}
+          />
+        ))}
       </div>
     </div>
   )

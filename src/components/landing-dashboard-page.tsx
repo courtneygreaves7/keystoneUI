@@ -1,20 +1,22 @@
+import { useEffect, useRef, useState } from "react"
 import {
   BarChart3,
+  Building2,
   ChevronRight,
+  PencilLine,
   Plus,
+  Users,
+  type LucideIcon,
 } from "lucide-react"
 
 import { getProductSplit } from "@/components/bookings-snapshot"
+import { ScaledPartnerPanelPreview } from "@/components/booking-engine/partner-panel-preview"
 import { TargetsSnapshot } from "@/components/targets-snapshot"
-import { DualDataWidget } from "@/components/dual-data-widget"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { MetricTrendWidget } from "@/components/widgets/metric-trend-widget"
 import { ProductSplitWidget } from "@/components/widgets/product-split-widget"
-import {
-  BOOKING_ENGINE_SUMMARY,
-  formatCount,
-} from "@/lib/booking-engine-data"
+import { BOOKING_ENGINE_PARTNERS } from "@/lib/booking-engine-data"
 import {
   type ActiveFilters,
   buildBookingTrendChart,
@@ -22,12 +24,13 @@ import {
   getBookingProfile,
 } from "@/lib/chart-data"
 import { metricCardGridClass } from "@/lib/card-layout"
-import { FIGURE_20PX_CLASS } from "@/lib/figure-styles"
 import { INSIGHTS_WIDGET_HELP_TEXT } from "@/lib/insights-widget-labels"
 import { cn } from "@/lib/utils"
 
+export type BookingEngineView = "partners" | "properties" | "editor"
+
 export type LandingDestination =
-  | { section: "booking-engine" }
+  | { section: "booking-engine"; view?: BookingEngineView }
   | { section: "insights"; anchor?: string }
   | { section: "admin" }
 
@@ -37,9 +40,6 @@ type LandingDashboardPageProps = {
 }
 
 const PANEL_BORDER_CLASS = "border-border bg-card"
-
-const PAS_WIDGET_HELP_TEXT =
-  "Policy admin metrics across connected partners, brands, and platform properties."
 
 type TeamWorkStatus = "in_progress" | "completed" | "in_review" | "blocked"
 
@@ -84,6 +84,30 @@ const TEAM_MEMBERS: TeamMember[] = [
     online: false,
     lastWorkedOn: "DDL take-up analysis",
     status: "in_review",
+  },
+  {
+    id: "elena",
+    name: "Elena Vasquez",
+    initials: "EV",
+    online: true,
+    lastWorkedOn: "Partner Gamma onboarding",
+    status: "in_progress",
+  },
+  {
+    id: "tom",
+    name: "Tom Fletcher",
+    initials: "TF",
+    online: false,
+    lastWorkedOn: "API webhook configuration",
+    status: "completed",
+  },
+  {
+    id: "priya",
+    name: "Priya Nair",
+    initials: "PN",
+    online: true,
+    lastWorkedOn: "YTD target adjustments",
+    status: "blocked",
   },
 ]
 
@@ -189,6 +213,28 @@ function formatFilterContext(filters: ActiveFilters) {
   return `${partner} · ${brand} · ${range}`
 }
 
+function OpsActionButton({
+  label,
+  icon: Icon,
+  onClick,
+}: {
+  label: string
+  icon: LucideIcon
+  onClick: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClick}
+      className="flex h-auto w-full flex-col items-center justify-center gap-1 px-2 py-2.5 text-center text-xs"
+    >
+      <Icon className="size-3.5 shrink-0" />
+      {label}
+    </Button>
+  )
+}
+
 function PanelHeaderAccent({ colors }: { colors: string[] }) {
   return (
     <div className="flex shrink-0 items-stretch gap-1.5 self-stretch" aria-hidden>
@@ -273,6 +319,23 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
   const productSplit = getProductSplit(booking)
   const bookingTrend = deriveBookingTrendMeta(booking.total)
   const bookingChart = buildBookingTrendChart(booking.total)
+  const snapshotPartner = BOOKING_ENGINE_PARTNERS[0]
+  const intelRef = useRef<HTMLDivElement>(null)
+  const [intelHeight, setIntelHeight] = useState<number>()
+
+  useEffect(() => {
+    const element = intelRef.current
+    if (!element) return
+
+    const updateHeight = () => {
+      setIntelHeight(element.getBoundingClientRect().height)
+    }
+
+    updateHeight()
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <TooltipProvider>
@@ -292,56 +355,56 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-8 items-stretch gap-3">
+        <div className="flex items-start gap-3">
         {/* Operations */}
+        <div
+          className="min-w-0 flex-1"
+          style={intelHeight !== undefined ? { height: intelHeight } : undefined}
+        >
         <DashboardPanel
-          className="col-span-4"
+          className="h-full"
+          variant="fill"
           label="Operations"
           subtitle="Partners, policies & connectivity"
-          headerAccentColors={["bg-red-500"]}
+          headerAccentColors={["bg-green-500"]}
           linkLabel="Manage"
           onLinkClick={() => onNavigate({ section: "booking-engine" })}
         >
-          <div className={cn(metricCardGridClass, "min-w-0 grid-cols-1 @md:grid-cols-2")}>
-              <DualDataWidget
-                className="min-w-0"
-                datasetA={{
-                  title: "Partners",
-                  value: formatCount(BOOKING_ENGINE_SUMMARY.partners),
-                  clarification: "Connected to engine",
-                }}
-                datasetB={{
-                  title: "Active brands",
-                  value: formatCount(BOOKING_ENGINE_SUMMARY.activeBrands),
-                  clarification: "Across all partners",
-                }}
-                helpText={PAS_WIDGET_HELP_TEXT}
-                valueClassName={FIGURE_20PX_CLASS}
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="grid grid-cols-3 gap-2">
+              <OpsActionButton
+                label="View partners"
+                icon={Users}
+                onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
               />
-              <DualDataWidget
-                className="min-w-0"
-                datasetA={{
-                  title: "Properties",
-                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalProperties),
-                  clarification: "On platform",
-                }}
-                datasetB={{
-                  title: "Cancellations",
-                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalCancellations),
-                  clarification: "Year to date",
-                }}
-                helpText={PAS_WIDGET_HELP_TEXT}
-                valueClassName={FIGURE_20PX_CLASS}
+              <OpsActionButton
+                label="View properties"
+                icon={Building2}
+                onClick={() => onNavigate({ section: "booking-engine", view: "properties" })}
+              />
+              <OpsActionButton
+                label="Editor mode"
+                icon={PencilLine}
+                onClick={() => onNavigate({ section: "booking-engine", view: "editor" })}
               />
             </div>
+
+            {snapshotPartner ? (
+              <div className="mt-4 -mx-5 -mb-4 flex min-h-0 flex-1 flex-col overflow-hidden px-5">
+                <ScaledPartnerPanelPreview partner={snapshotPartner} className="min-h-0 flex-1" />
+              </div>
+            ) : null}
+          </div>
         </DashboardPanel>
+        </div>
 
         {/* Intelligence */}
+        <div ref={intelRef} className="min-w-0 flex-1">
         <DashboardPanel
-          className="col-span-4"
+          variant="compact"
           label="Intelligence"
           subtitle="Insights, trends & benchmarks"
-          headerAccentColors={["bg-emerald-500"]}
+          headerAccentColors={["bg-purple-500"]}
           linkLabel="Full report"
           onLinkClick={() => onNavigate({ section: "insights" })}
         >
@@ -394,8 +457,20 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
           </div>
         </DashboardPanel>
         </div>
+        </div>
 
         <div className="grid grid-cols-8 items-stretch gap-3">
+        <DashboardPanel
+          className="col-span-4"
+          label="Targets"
+          subtitle="Progress against this period's goals"
+          headerAccentColors={["bg-rose-500"]}
+          linkLabel="Manage targets"
+          onLinkClick={() => onNavigate({ section: "insights" })}
+        >
+          <TargetsSnapshot />
+        </DashboardPanel>
+
         <DashboardPanel
           className="col-span-4"
           label="Team"
@@ -413,17 +488,6 @@ export function LandingDashboardPage({ filters, onNavigate }: LandingDashboardPa
               <TeamMemberRow key={member.id} member={member} />
             ))}
           </ul>
-        </DashboardPanel>
-
-        <DashboardPanel
-          className="col-span-4"
-          label="Targets"
-          subtitle="Progress against this period's goals"
-          headerAccentColors={["bg-rose-500"]}
-          linkLabel="Manage targets"
-          onLinkClick={() => onNavigate({ section: "insights" })}
-        >
-          <TargetsSnapshot />
         </DashboardPanel>
         </div>
 

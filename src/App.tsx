@@ -17,6 +17,7 @@ import {
 import { BookingEnginePage } from "@/components/booking-engine-page"
 import {
   LandingDashboardPage,
+  type BookingEngineView,
   type LandingDestination,
 } from "@/components/landing-dashboard-page"
 import { DesignSystemView } from "@/components/components-page"
@@ -153,13 +154,27 @@ function App() {
   const [activeSection, setActiveSection] = useState<ActiveSection>("home")
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [insightsScrollTarget, setInsightsScrollTarget] = useState<string | null>(null)
+  const [bookingEngineView, setBookingEngineView] = useState<BookingEngineView>("partners")
+  const [bookingEngineNavigationKey, setBookingEngineNavigationKey] = useState(0)
 
   function handleLogout() {
     setIsAuthenticated(false)
   }
 
+  function handleSectionSelect(section: ActiveSection) {
+    if (section === "booking-engine" && activeSection !== "booking-engine") {
+      setBookingEngineView("partners")
+      setBookingEngineNavigationKey((key) => key + 1)
+    }
+    setActiveSection(section)
+  }
+
   function handleLandingNavigate(destination: LandingDestination) {
     setActiveSection(destination.section)
+    if (destination.section === "booking-engine") {
+      setBookingEngineView(destination.view ?? "partners")
+      setBookingEngineNavigationKey((key) => key + 1)
+    }
     if (destination.section === "insights" && destination.anchor) {
       setInsightsScrollTarget(destination.anchor)
     }
@@ -244,7 +259,7 @@ function App() {
                             key={item.id}
                             {...item}
                             activeSection={activeSection}
-                            onSelect={setActiveSection}
+                            onSelect={handleSectionSelect}
                           />
                         ))}
                       </div>
@@ -306,7 +321,7 @@ function App() {
                         key={item.id}
                         {...item}
                         activeSection={activeSection}
-                        onSelect={setActiveSection}
+                        onSelect={handleSectionSelect}
                         collapsed
                       />
                     ))}
@@ -429,7 +444,10 @@ function App() {
                         onNavigate={handleLandingNavigate}
                       />
                     ) : activeSection === "booking-engine" ? (
-                      <BookingEnginePage />
+                      <BookingEnginePage
+                        key={bookingEngineNavigationKey}
+                        initialView={bookingEngineView}
+                      />
                     ) : activeSection === "admin" ? (
                       <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">
                         <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">

@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { Download, Plus } from "lucide-react"
+import { Download, PencilLine, Plus } from "lucide-react"
 
 import { PartnerCard } from "@/components/booking-engine/partner-card"
 import { PropertiesListPage } from "@/components/booking-engine/properties-list-page"
 import { PropertyPage } from "@/components/booking-engine/property-page"
+import type { BookingEngineView } from "@/components/landing-dashboard-page"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { DualDataWidget } from "@/components/dual-data-widget"
@@ -20,10 +21,44 @@ import { MOCK_PROPERTY } from "@/lib/property-data"
 import { getPropertiesForPartner } from "@/lib/properties-list-data"
 import { cn } from "@/lib/utils"
 
-export function BookingEnginePage() {
-  const [expandedPartnerId, setExpandedPartnerId] = useState<string>("partner-a")
-  const [propertiesPartnerId, setPropertiesPartnerId] = useState<string | null>(null)
+const DEFAULT_PARTNER_ID = BOOKING_ENGINE_PARTNERS[0]?.id ?? ""
+
+function getInitialPasState(initialView: BookingEngineView) {
+  switch (initialView) {
+    case "properties":
+      return {
+        expandedPartnerId: "",
+        propertiesPartnerId: DEFAULT_PARTNER_ID,
+        editorMode: false,
+      }
+    case "editor":
+      return {
+        expandedPartnerId: DEFAULT_PARTNER_ID,
+        propertiesPartnerId: null as string | null,
+        editorMode: true,
+      }
+    case "partners":
+    default:
+      return {
+        expandedPartnerId: "",
+        propertiesPartnerId: null as string | null,
+        editorMode: false,
+      }
+  }
+}
+
+type BookingEnginePageProps = {
+  initialView?: BookingEngineView
+}
+
+export function BookingEnginePage({ initialView = "partners" }: BookingEnginePageProps) {
+  const initialState = getInitialPasState(initialView)
+  const [expandedPartnerId, setExpandedPartnerId] = useState(initialState.expandedPartnerId)
+  const [propertiesPartnerId, setPropertiesPartnerId] = useState<string | null>(
+    initialState.propertiesPartnerId
+  )
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+  const [editorMode] = useState(initialState.editorMode)
 
   const propertiesPartner = BOOKING_ENGINE_PARTNERS.find(
     (partner) => partner.id === propertiesPartnerId
@@ -81,6 +116,15 @@ export function BookingEnginePage() {
             </Button>
           </div>
         </div>
+
+        {editorMode ? (
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-xs text-muted-foreground">
+            <PencilLine className="size-3.5 shrink-0 text-foreground" />
+            <span>
+              Editor mode — update brands, policy groups and rates in the partner panels below.
+            </span>
+          </div>
+        ) : null}
 
         <div className="@container min-w-0">
           <div className={cn(metricCardGridClass, "grid-cols-1 @md:grid-cols-2")}>
