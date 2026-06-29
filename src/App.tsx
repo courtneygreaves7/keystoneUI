@@ -4,9 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LayoutDashboard,
-  LayoutPanelTop,
   SquareChartGantt,
-  Palette,
   Zap,
   LogOut,
   MoonStar,
@@ -18,6 +16,7 @@ import {
 import { BookingEnginePage } from "@/components/booking-engine-page"
 import {
   LandingDashboardPage,
+  type BookingEngineAction,
   type BookingEngineView,
   type LandingDestination,
 } from "@/components/landing-dashboard-page"
@@ -71,6 +70,9 @@ const navGroups = [
     items: [{ id: "admin" as const, label: "Admin", icon: Settings2 }],
   },
 ] as const
+
+/** Re-enable when the design system page is ready to surface documented components. */
+const SHOW_DESIGN_SYSTEM_NAV = false
 
 type NavItemId = (typeof navGroups)[number]["items"][number]["id"]
 type ActiveSection = NavItemId | "components"
@@ -156,19 +158,17 @@ function App() {
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [insightsScrollTarget, setInsightsScrollTarget] = useState<string | null>(null)
   const [bookingEngineView, setBookingEngineView] = useState<BookingEngineView>("partners")
+  const [bookingEngineAction, setBookingEngineAction] = useState<BookingEngineAction | undefined>()
   const [bookingEngineNavigationKey, setBookingEngineNavigationKey] = useState(0)
-  const [isCustomisingDashboard, setIsCustomisingDashboard] = useState(false)
 
   function handleLogout() {
     setIsAuthenticated(false)
   }
 
   function handleSectionSelect(section: ActiveSection) {
-    if (section !== "home") {
-      setIsCustomisingDashboard(false)
-    }
     if (section === "booking-engine" && activeSection !== "booking-engine") {
       setBookingEngineView("partners")
+      setBookingEngineAction(undefined)
       setBookingEngineNavigationKey((key) => key + 1)
     }
     setActiveSection(section)
@@ -178,6 +178,7 @@ function App() {
     setActiveSection(destination.section)
     if (destination.section === "booking-engine") {
       setBookingEngineView(destination.view ?? "partners")
+      setBookingEngineAction(destination.action)
       setBookingEngineNavigationKey((key) => key + 1)
     }
     if (destination.section === "insights" && destination.anchor) {
@@ -274,14 +275,15 @@ function App() {
               </div>
 
               <div className="relative z-30 mt-auto shrink-0 space-y-4 overflow-visible px-5 pb-6 pt-4">
-                <Button
-                  variant="outline"
-                  className="w-full justify-center gap-2 bg-card"
-                  onClick={() => setActiveSection("components")}
-                >
-                  <Palette className="size-4 shrink-0" />
-                  Design system
-                </Button>
+                {SHOW_DESIGN_SYSTEM_NAV ? (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-center gap-2 bg-card"
+                    onClick={() => setActiveSection("components")}
+                  >
+                    Design system
+                  </Button>
+                ) : null}
                 {activeSection === "insights" && <SectionNav />}
                 <Button
                   variant="outline"
@@ -335,19 +337,21 @@ function App() {
               </nav>
 
               <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-1 overflow-visible px-2 pb-4 pt-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={() => setActiveSection("components")}
-                      aria-label="Design system"
-                      className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
-                    >
-                      <Palette className="size-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>Design system</TooltipContent>
-                </Tooltip>
+                {SHOW_DESIGN_SYSTEM_NAV ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setActiveSection("components")}
+                        aria-label="Design system"
+                        className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+                      >
+                        <SquareChartGantt className="size-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Design system</TooltipContent>
+                  </Tooltip>
+                ) : null}
                 {activeSection === "insights" && <SectionNav collapsed />}
                 <button
                   type="button"
@@ -383,18 +387,6 @@ function App() {
             </Breadcrumb>
 
             <div className="flex items-center gap-2">
-              {activeSection === "home" ? (
-                <Button
-                  variant={isCustomisingDashboard ? "default" : "outline"}
-                  size="sm"
-                  className="h-9 gap-2"
-                  onClick={() => setIsCustomisingDashboard((value) => !value)}
-                >
-                  <LayoutPanelTop className="size-4" />
-                  Customise
-                </Button>
-              ) : null}
-
               <Button
                 variant="outline"
                 size="icon"
@@ -466,12 +458,12 @@ function App() {
                       <LandingDashboardPage
                         filters={activeFilters}
                         onNavigate={handleLandingNavigate}
-                        isCustomising={isCustomisingDashboard}
                       />
                     ) : activeSection === "booking-engine" ? (
                       <BookingEnginePage
                         key={bookingEngineNavigationKey}
                         initialView={bookingEngineView}
+                        initialAction={bookingEngineAction}
                       />
                     ) : activeSection === "admin" ? (
                       <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">

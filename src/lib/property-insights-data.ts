@@ -59,6 +59,9 @@ export const PROPERTY_BOOKINGS_INSIGHT = {
   calBookings: 0,
   cancelledCount: 1,
   propertyName: "Willowcroft House",
+  peakMonth: "Feb",
+  peakCount: 5,
+  peakSharePercent: 42,
   monthlyTrend: [
     { label: "Jan", value: 1 },
     { label: "Feb", value: 5 },
@@ -67,6 +70,13 @@ export const PROPERTY_BOOKINGS_INSIGHT = {
     { label: "May", value: 0 },
     { label: "Jun", value: 0 },
   ] satisfies InsightTrendPoint[],
+}
+
+export const PROPERTY_BOOKING_VALUE_INSIGHT = {
+  benchmarkPercent: 91,
+  benchmarkLabel: "91% of portfolio avg (£712)",
+  totalRevenue: "£7,783",
+  revenuePerNight: "£63.60",
 }
 
 export const PROPERTY_CANCEL_TO_STAY: PropertyCancelBenchmarkInsight = {

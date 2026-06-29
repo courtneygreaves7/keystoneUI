@@ -50,7 +50,6 @@ export function CalFinancials({ filters }: { filters: ActiveFilters }) {
               comparisonLabel={trendMeta.comparisonLabel}
               chartData={trendChart}
               breakdownRows={breakdownHighlight}
-              footerLabel="GBP · primary liability"
               helpText={INSIGHTS_WIDGET_HELP_TEXT}
             />
             <DataSnapshotWidget

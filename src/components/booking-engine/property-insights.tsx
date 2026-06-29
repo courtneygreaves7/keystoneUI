@@ -18,6 +18,7 @@ import {
   PROPERTY_AVG_GUESTS,
   PROPERTY_AVG_NIGHTS,
   PROPERTY_BOOKINGS_COUNT_TREND,
+  PROPERTY_BOOKING_VALUE_INSIGHT,
   PROPERTY_BOOKING_VALUE_TREND,
   PROPERTY_CANCEL_FROM_BOOKING,
   PROPERTY_CANCEL_TO_STAY,
@@ -103,6 +104,17 @@ export function PropertyInsights() {
                 breakdownRows={[
                   { label: "Peak season", value: "£712", sharePercent: 52 },
                   { label: "Off-peak", value: "£585", sharePercent: 48 },
+                ]}
+                insightBenchmark={{
+                  percent: PROPERTY_BOOKING_VALUE_INSIGHT.benchmarkPercent,
+                  label: PROPERTY_BOOKING_VALUE_INSIGHT.benchmarkLabel,
+                }}
+                insightHighlights={[
+                  { label: "Total revenue", value: PROPERTY_BOOKING_VALUE_INSIGHT.totalRevenue },
+                  {
+                    label: "Revenue / night",
+                    value: PROPERTY_BOOKING_VALUE_INSIGHT.revenuePerNight,
+                  },
                 ]}
                 footerLabel="Based on 12 confirmed bookings"
                 helpText={INSIGHTS_WIDGET_HELP_TEXT}

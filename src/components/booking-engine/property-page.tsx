@@ -6,7 +6,10 @@ import {
   Calendar,
   ChevronRight,
   ExternalLink,
+  Home,
   MapPin,
+  PawPrint,
+  Star,
   Users,
   XCircle,
 } from "lucide-react"
@@ -187,12 +190,13 @@ function PropertyOverviewTab({
   const pets = overviewValue("Pets")
   const recentBookings = property.bookings.slice(0, 5)
   const specificationRows = [
-    { label: "Property type", value: propertyType },
-    { label: "Grade", value: grade },
-    { label: "Location", value: property.location },
-    { label: "Bedrooms", value: `${bedrooms} bed` },
-    { label: "Bathrooms", value: `${bathrooms} bath` },
+    { icon: Home, label: "Property type", value: propertyType },
+    { icon: Star, label: "Grade", value: grade },
+    { icon: MapPin, label: "Location", value: property.location },
+    { icon: BedDouble, label: "Bedrooms", value: `${bedrooms} bed` },
+    { icon: Bath, label: "Bathrooms", value: `${bathrooms} bath` },
     {
+      icon: PawPrint,
       label: "Pets",
       value: pets,
       highlight: pets.toLowerCase() === "allowed",
@@ -206,64 +210,71 @@ function PropertyOverviewTab({
 
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(220px,280px)_minmax(280px,340px)_minmax(0,1fr)] xl:items-stretch">
-          <div className="relative aspect-[5/4] min-h-[200px] overflow-hidden border-b border-border bg-muted/30 sm:aspect-auto xl:aspect-auto xl:min-h-0 xl:border-r xl:border-b-0">
-            <img
-              src={property.imageUrl}
-              alt={`${property.name} exterior`}
-              className="absolute inset-0 h-full w-full object-cover object-[center_62%]"
-            />
-            <ul className="absolute right-3 top-3 flex items-center gap-2.5 rounded-lg border border-white/25 bg-black/35 px-2.5 py-1.5 shadow-sm backdrop-blur-md">
-              {capacityRows.map((item) => (
-                <li
-                  key={item.label}
-                  className="flex items-center gap-1"
-                  aria-label={`${item.value} ${item.label.toLowerCase()}`}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:items-stretch">
+        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-[minmax(200px,240px)_minmax(0,1fr)] sm:items-stretch">
+            <div className="relative aspect-[5/4] min-h-[200px] overflow-hidden border-b border-border bg-muted/30 sm:aspect-auto sm:min-h-0 sm:border-r sm:border-b-0">
+              <img
+                src={property.imageUrl}
+                alt={`${property.name} exterior`}
+                className="absolute inset-0 h-full w-full object-cover object-[center_62%]"
+              />
+              <ul className="absolute right-3 top-3 flex items-center gap-2.5 rounded-lg border border-white/25 bg-black/35 px-2.5 py-1.5 shadow-sm backdrop-blur-md">
+                {capacityRows.map((item) => (
+                  <li
+                    key={item.label}
+                    className="flex items-center gap-1"
+                    aria-label={`${item.value} ${item.label.toLowerCase()}`}
+                  >
+                    <item.icon className="size-3.5 shrink-0 text-white/90" strokeWidth={2} />
+                    <span className="text-xs font-semibold tabular-nums leading-none text-white">
+                      {item.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="absolute inset-x-0 bottom-0 flex justify-end bg-gradient-to-t from-black/55 to-transparent p-3 pt-12">
+                <button
+                  type="button"
+                  className="rounded-full bg-black/70 px-2.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
                 >
-                  <item.icon className="size-3.5 shrink-0 text-white/90" strokeWidth={2} />
-                  <span className="text-xs font-semibold tabular-nums leading-none text-white">
-                    {item.value}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="absolute inset-x-0 bottom-0 flex justify-end bg-gradient-to-t from-black/55 to-transparent p-3 pt-12">
-              <button
-                type="button"
-                className="rounded-full bg-black/70 px-2.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
-              >
-                12 photos
-              </button>
+                  12 photos
+                </button>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-col p-4">
+              <h2 className="mb-3 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+                Specification
+              </h2>
+              <dl className="flex min-h-0 flex-1 flex-col">
+                {specificationRows.map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex items-center justify-between gap-3 border-b border-border py-2 last:border-0"
+                  >
+                    <dt className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+                      <row.icon className="size-3.5 shrink-0" strokeWidth={2} />
+                      <span>{row.label}</span>
+                    </dt>
+                    <dd className="shrink-0 text-right text-xs font-semibold text-foreground">
+                      {"highlight" in row && row.highlight ? (
+                        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-400">
+                          {row.value}
+                        </span>
+                      ) : (
+                        row.value
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
+        </section>
 
-          <div className="flex min-h-0 flex-col border-b border-border p-4 xl:border-r xl:border-b-0">
-            <h2 className="mb-3 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-              Specification
-            </h2>
-            <dl className="flex min-h-0 flex-1 flex-col">
-              {specificationRows.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex items-center justify-between gap-3 border-b border-border py-2 last:border-0 xl:py-2.5"
-                >
-                  <dt className="text-xs text-muted-foreground">{row.label}</dt>
-                  <dd className="text-right text-xs font-semibold text-foreground">
-                    {"highlight" in row && row.highlight ? (
-                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-400">
-                        {row.value}
-                      </span>
-                    ) : (
-                      row.value
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div className="grid grid-cols-2">
+        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+          <div className="grid h-full grid-cols-2">
             <PropertyStatCard
               title="Total bookings"
               value={String(property.bookingCount)}
@@ -304,8 +315,8 @@ function PropertyOverviewTab({
               embedded
             />
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] xl:items-stretch">
         <PropertyPanel

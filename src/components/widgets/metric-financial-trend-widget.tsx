@@ -3,8 +3,10 @@ import { useId } from "react"
 import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts"
 
 import {
+  InsightBenchmarkBar,
   InsightCardBody,
   InsightFooter,
+  InsightHighlightGrid,
   InsightMetricGroup,
   InsightVisualGroup,
   insightCardHeaderClass,
@@ -13,7 +15,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { MetricTrendDirection, MetricTrendPoint } from "@/components/widgets/metric-trend-widget"
 import { WidgetHelpButton } from "@/components/widgets/widget-help-button"
-import { FIGURE_24PX_CLASS, METRIC_WIDGET_STACK_GAP_CLASS } from "@/lib/figure-styles"
+import { FIGURE_24PX_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
 export type FinancialBreakdownRow = {
@@ -30,7 +32,9 @@ export type MetricFinancialTrendWidgetProps = {
   comparisonLabel: string
   chartData: MetricTrendPoint[]
   breakdownRows: FinancialBreakdownRow[]
-  footerLabel: string
+  footerLabel?: string
+  insightBenchmark?: { percent: number; label: string }
+  insightHighlights?: Array<{ label: string; value: string }>
   helpText?: string
   className?: string
   insightLayout?: boolean
@@ -70,6 +74,8 @@ export function MetricFinancialTrendWidget({
   chartData,
   breakdownRows,
   footerLabel,
+  insightBenchmark,
+  insightHighlights,
   helpText,
   className,
   insightLayout = false,
@@ -88,7 +94,7 @@ export function MetricFinancialTrendWidget({
 
         <CardContent className="flex min-h-0 flex-1 flex-col p-0">
           <InsightCardBody>
-            <InsightMetricGroup>
+            <InsightMetricGroup className="shrink-0">
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <p
                   className={cn(
@@ -103,80 +109,96 @@ export function MetricFinancialTrendWidget({
               <p className="text-xs text-muted-foreground">{comparisonLabel}</p>
             </InsightMetricGroup>
 
-            <InsightVisualGroup>
-              <div className={insightChartHeightClass}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.1} />
-                        <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="label"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={TICK_STYLE}
-                      interval={0}
-                      dy={4}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="var(--foreground)"
-                      strokeWidth={1.75}
-                      strokeOpacity={0.55}
-                      fill={`url(#${gradientId})`}
-                      dot={false}
-                      activeDot={false}
-                      isAnimationActive={false}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+            <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
+              <InsightVisualGroup className="gap-4">
+                <div className={insightChartHeightClass}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.1} />
+                          <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis
+                        dataKey="label"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={TICK_STYLE}
+                        interval={0}
+                        dy={4}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="var(--foreground)"
+                        strokeWidth={1.75}
+                        strokeOpacity={0.55}
+                        fill={`url(#${gradientId})`}
+                        dot={false}
+                        activeDot={false}
+                        isAnimationActive={false}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <div
-                  className="flex h-2 w-full overflow-hidden rounded-full bg-muted"
-                  role="img"
-                  aria-label={breakdownRows
-                    .map((row) => `${row.sharePercent}% ${row.label}`)
-                    .join(", ")}
-                >
-                  {breakdownRows.map((row, index) => (
-                    <div
-                      key={row.label}
-                      className={cn(
-                        "h-full transition-[width]",
-                        SEGMENT_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
-                      )}
-                      style={{ width: `${row.sharePercent}%` }}
-                    />
+                <div className="flex flex-col gap-2.5">
+                  <div
+                    className="flex h-2 w-full overflow-hidden rounded-full bg-muted"
+                    role="img"
+                    aria-label={breakdownRows
+                      .map((row) => `${row.sharePercent}% ${row.label}`)
+                      .join(", ")}
+                  >
+                    {breakdownRows.map((row, index) => (
+                      <div
+                        key={row.label}
+                        className={cn(
+                          "h-full transition-[width]",
+                          SEGMENT_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
+                        )}
+                        style={{ width: `${row.sharePercent}%` }}
+                      />
+                    ))}
+                  </div>
+                  {breakdownRows.map((row) => (
+                    <div key={row.label} className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="size-2 shrink-0 rounded-full bg-muted-foreground" aria-hidden />
+                        <span className="truncate text-xs text-muted-foreground">{row.label}</span>
+                      </div>
+                      <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
+                        {row.value}
+                      </span>
+                    </div>
                   ))}
                 </div>
-                {breakdownRows.map((row) => (
-                  <div key={row.label} className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span className="size-2 shrink-0 rounded-full bg-muted-foreground" aria-hidden />
-                      <span className="truncate text-xs text-muted-foreground">{row.label}</span>
-                    </div>
-                    <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </InsightVisualGroup>
+              </InsightVisualGroup>
 
-            <InsightFooter
-              left={
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                  <Shield className="size-3.5 shrink-0" strokeWidth={2} />
-                  <span>{footerLabel}</span>
-                </div>
-              }
-            />
+              {insightBenchmark ? (
+                <InsightBenchmarkBar
+                  percent={insightBenchmark.percent}
+                  label={insightBenchmark.label}
+                />
+              ) : null}
+
+              {insightHighlights?.length ? (
+                <InsightHighlightGrid items={insightHighlights} />
+              ) : null}
+            </div>
+
+            {footerLabel ? (
+              <InsightFooter
+                className="mt-0 shrink-0"
+                left={
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <Shield className="size-3.5 shrink-0" strokeWidth={2} />
+                    <span>{footerLabel}</span>
+                  </div>
+                }
+              />
+            ) : null}
           </InsightCardBody>
         </CardContent>
       </Card>
@@ -190,13 +212,8 @@ export function MetricFinancialTrendWidget({
         <WidgetHelpButton title={title} helpText={helpText} />
       </CardHeader>
 
-      <CardContent
-        className={cn(
-          "flex min-h-0 flex-1 flex-col px-4 pb-4 pt-2",
-          METRIC_WIDGET_STACK_GAP_CLASS
-        )}
-      >
-        <div className={cn("flex flex-col", METRIC_WIDGET_STACK_GAP_CLASS)}>
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-5 px-4 pb-5 pt-3">
+        <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <p
               className={cn(
@@ -211,7 +228,7 @@ export function MetricFinancialTrendWidget({
           <p className="text-xs text-muted-foreground @sm:text-sm">{comparisonLabel}</p>
         </div>
 
-        <div className="h-20 w-full min-h-0">
+        <div className="h-24 w-full min-h-0">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
               <defs>
@@ -242,7 +259,7 @@ export function MetricFinancialTrendWidget({
           </ResponsiveContainer>
         </div>
 
-        <div className={cn("flex flex-col", METRIC_WIDGET_STACK_GAP_CLASS)}>
+        <div className="flex flex-col gap-4">
           <div
             className="flex h-2 w-full overflow-hidden rounded-full bg-muted"
             role="img"
@@ -262,7 +279,7 @@ export function MetricFinancialTrendWidget({
             ))}
           </div>
 
-          <div className={cn("flex flex-col", METRIC_WIDGET_STACK_GAP_CLASS)}>
+          <div className="flex flex-col gap-3">
             {breakdownRows.map((row) => (
               <div key={row.label} className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
@@ -279,10 +296,12 @@ export function MetricFinancialTrendWidget({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5 border-t border-border pt-2 text-xs text-muted-foreground">
-          <Shield className="size-3.5 shrink-0" strokeWidth={2.25} />
-          <span>{footerLabel}</span>
-        </div>
+        {footerLabel ? (
+          <div className="flex shrink-0 items-center gap-1.5 border-t border-border pt-2 text-xs text-muted-foreground">
+            <Shield className="size-3.5 shrink-0" strokeWidth={2.25} />
+            <span>{footerLabel}</span>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   )

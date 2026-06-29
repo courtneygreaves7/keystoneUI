@@ -2,7 +2,9 @@ import { Calendar, Home, TrendingUp } from "lucide-react"
 
 import {
   InsightBadge,
+  InsightCallout,
   InsightCardBody,
+  InsightDistributionBars,
   InsightFooter,
   InsightMetricGroup,
   InsightMiniSparkline,
@@ -24,6 +26,10 @@ export function PropertyBookingsWidget({ helpText, className }: PropertyBookings
   const peakIndex = PROPERTY_BOOKINGS_INSIGHT.monthlyTrend.findIndex(
     (point) => point.value === Math.max(...PROPERTY_BOOKINGS_INSIGHT.monthlyTrend.map((p) => p.value))
   )
+  const monthlyDistribution = PROPERTY_BOOKINGS_INSIGHT.monthlyTrend.map((point) => ({
+    label: point.label,
+    count: point.value,
+  }))
 
   return (
     <Card className={cn("@container flex h-full min-w-0 flex-col bg-card shadow-xs", className)}>
@@ -48,27 +54,41 @@ export function PropertyBookingsWidget({ helpText, className }: PropertyBookings
 
       <CardContent className="flex min-h-0 flex-1 flex-col p-0">
         <InsightCardBody>
-          <InsightMetricGroup>
+          <InsightMetricGroup className="shrink-0">
             <p className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
               {PROPERTY_BOOKINGS_INSIGHT.total}
             </p>
           </InsightMetricGroup>
 
-          <InsightVisualGroup>
-            <InsightMiniSparkline
-              data={PROPERTY_BOOKINGS_INSIGHT.monthlyTrend}
-              highlightIndex={peakIndex >= 0 ? peakIndex : undefined}
-            />
-            <InsightStatRow
-              columns={[
-                { label: "Month avg", value: String(PROPERTY_BOOKINGS_INSIGHT.monthAvg) },
-                { label: "CAL", value: String(PROPERTY_BOOKINGS_INSIGHT.calBookings) },
-                { label: "Cancelled", value: String(PROPERTY_BOOKINGS_INSIGHT.cancelledCount) },
-              ]}
-            />
-          </InsightVisualGroup>
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
+            <InsightVisualGroup className="gap-4">
+              <InsightMiniSparkline
+                data={PROPERTY_BOOKINGS_INSIGHT.monthlyTrend}
+                height={72}
+                highlightIndex={peakIndex >= 0 ? peakIndex : undefined}
+              />
+              <InsightStatRow
+                columns={[
+                  { label: "Month avg", value: String(PROPERTY_BOOKINGS_INSIGHT.monthAvg) },
+                  { label: "CAL", value: String(PROPERTY_BOOKINGS_INSIGHT.calBookings) },
+                  { label: "Cancelled", value: String(PROPERTY_BOOKINGS_INSIGHT.cancelledCount) },
+                ]}
+              />
+            </InsightVisualGroup>
+
+            <InsightDistributionBars title="Bookings by month" items={monthlyDistribution} />
+
+            <InsightCallout>
+              <span className="font-medium text-foreground">
+                {PROPERTY_BOOKINGS_INSIGHT.peakMonth}
+              </span>{" "}
+              was peak — {PROPERTY_BOOKINGS_INSIGHT.peakCount} bookings (
+              {PROPERTY_BOOKINGS_INSIGHT.peakSharePercent}% of annual volume).
+            </InsightCallout>
+          </div>
 
           <InsightFooter
+            className="mt-0 shrink-0"
             left={
               <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                 <Home className="size-3.5 shrink-0" strokeWidth={2} />

@@ -13,7 +13,7 @@ import {
 import { AddPartnerPage } from "@/components/booking-engine/add-partner-page"
 import { PartnerListItem } from "@/components/booking-engine/partner-list-item"
 import { PropertyPage } from "@/components/booking-engine/property-page"
-import type { BookingEngineView } from "@/components/landing-dashboard-page"
+import type { BookingEngineAction, BookingEngineView } from "@/components/landing-dashboard-page"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -73,16 +73,20 @@ function getInitialPasState(initialView: BookingEngineView) {
 
 type BookingEnginePageProps = {
   initialView?: BookingEngineView
+  initialAction?: BookingEngineAction
 }
 
-export function BookingEnginePage({ initialView = "partners" }: BookingEnginePageProps) {
+export function BookingEnginePage({
+  initialView = "partners",
+  initialAction,
+}: BookingEnginePageProps) {
   const initialState = getInitialPasState(initialView)
   const [selectedPartnerId, setSelectedPartnerId] = useState(initialState.selectedPartnerId)
   const [activeTab, setActiveTab] = useState<PartnerDetailTab>(initialState.initialTab)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [editorMode] = useState(initialState.editorMode)
   const [partnerSearch, setPartnerSearch] = useState("")
-  const [showAddPartner, setShowAddPartner] = useState(false)
+  const [showAddPartner, setShowAddPartner] = useState(initialAction === "add-partner")
 
   const filteredPartners = useMemo(
     () => BOOKING_ENGINE_PARTNERS.filter((partner) => partnerMatchesSearch(partner, partnerSearch)),
