@@ -60,7 +60,6 @@ import { cn } from "@/lib/utils"
 
 type ManageTargetsPageProps = {
   onBack: () => void
-  onTabChange?: (tab: string) => void
 }
 
 const TICK_STYLE = { fontSize: 9, fill: "var(--color-muted-foreground)" }
@@ -305,9 +304,6 @@ function OrganisationTargetCard({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-foreground">{target.label}</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Current: {formatTargetValue(target)}
-              </p>
             </div>
             {meta.visual !== "arc" ? (
               <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
@@ -322,23 +318,31 @@ function OrganisationTargetCard({
         <TargetMetricVisual target={target} percent={percent} />
       </div>
 
-      <Field className="mt-3">
-        <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
-          Target goal
-        </Label>
-        <Input
-          id={`org-target-${target.id}`}
-          type="number"
-          step={target.format === "percent" ? "0.1" : "1"}
-          min={0}
-          value={target.target}
-          onChange={(event) => onTargetChange(Number.parseFloat(event.target.value) || 0)}
-          className="h-9 text-xs tabular-nums"
-        />
-        <p className="text-[10px] text-muted-foreground">
-          Goal: {formatTargetGoal({ ...target, target: target.target })}
-        </p>
-      </Field>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <Field>
+          <Label className="text-[11px] text-muted-foreground">Actual</Label>
+          <div className="flex h-9 items-center rounded-md border border-border bg-muted/20 px-3 text-xs tabular-nums text-foreground">
+            {formatTargetValue(target)}
+          </div>
+        </Field>
+        <Field>
+          <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
+            Target goal
+          </Label>
+          <Input
+            id={`org-target-${target.id}`}
+            type="number"
+            step={target.format === "percent" ? "0.1" : "1"}
+            min={0}
+            value={target.target}
+            onChange={(event) => onTargetChange(Number.parseFloat(event.target.value) || 0)}
+            className="h-9 text-xs tabular-nums"
+          />
+          <p className="text-[10px] text-muted-foreground">
+            Goal: {formatTargetGoal({ ...target, target: target.target })}
+          </p>
+        </Field>
+      </div>
     </article>
   )
 }
@@ -487,6 +491,7 @@ function HeaderSummaryWidget({
   trend = "up",
   sparklineData,
   barValues,
+  className,
 }: {
   label: string
   value: string | number
@@ -494,11 +499,17 @@ function HeaderSummaryWidget({
   trend?: "up" | "down" | "neutral"
   sparklineData?: TargetProgressPoint[]
   barValues?: number[]
+  className?: string
 }) {
   const TrendIcon = trend === "down" ? TrendingDown : TrendingUp
 
   return (
-    <article className="min-w-[9.5rem] rounded-lg border border-border bg-card px-3 py-2.5 shadow-xs">
+    <article
+      className={cn(
+        "min-w-0 rounded-lg border border-border bg-card px-3 py-2.5 shadow-xs",
+        className
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <p className="text-[9px] font-semibold tracking-widest text-muted-foreground uppercase">
           {label}
@@ -848,10 +859,9 @@ function TargetsReportPanel({
   )
 }
 
-export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProps) {
+export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("organisation")
-  const isTeamTab = activeTab === "team"
   const [orgTargets, setOrgTargets] = useState<LandingTarget[]>(() => getOrgTargets())
   const [memberTargets, setMemberTargets] = useState<MemberTargets[]>(() => getMemberTargets())
   const [selectedMemberId, setSelectedMemberId] = useState(TEAM_MEMBERS[0]?.id ?? "")
@@ -997,66 +1007,54 @@ export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProp
 
   function handleTabChange(tab: string) {
     setActiveTab(tab)
-    onTabChange?.(tab)
   }
 
   return (
-    <div
-      className={cn(
-        "mx-auto w-full max-w-6xl",
-        isTeamTab ? "flex h-full min-h-0 flex-1 flex-col gap-6" : "space-y-6 pb-8"
-      )}
-    >
+    <div className="w-full space-y-6">
       <div className="shrink-0 border-b border-border pb-5">
-        <div className="mb-3 flex justify-end">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-xs font-medium text-muted-foreground">Home · Targets</p>
           <Button type="button" variant="outline" className="h-9 gap-2 text-xs" onClick={onBack}>
             <ArrowLeft className="size-3.5" />
             Back to home
           </Button>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-muted-foreground">Home · Targets</p>
-            <h1 className="mt-1 text-[22px] font-semibold tracking-tight text-foreground">
-              Manage targets
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Set organisation-wide goals and assign targets to team members for YTD to June 2026.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <HeaderSummaryWidget
-              label="Org metrics"
-              value={orgTargets.length}
-              trendLabel={`${orgAchievement}% avg`}
-              trend={orgAchievement >= 60 ? "up" : "down"}
-              barValues={orgAchievementBars}
-            />
-            <HeaderSummaryWidget
-              label="Team members"
-              value={TEAM_MEMBERS.length}
-              trendLabel={`+${teamSizeDelta} YTD`}
-              trend="up"
-              sparklineData={TEAM_SIZE_TREND}
-            />
-            <HeaderSummaryWidget
-              label="Avg achievement"
-              value={`${teamSummary}%`}
-              trendLabel={`+${achievementTrendDelta} pts`}
-              trend={achievementTrendDelta >= 0 ? "up" : "down"}
-              sparklineData={LANDING_TARGET_PROGRESS_CHART}
-            />
-          </div>
+        <div className="mt-1 min-w-0">
+          <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+            Manage targets
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Set organisation-wide goals and assign targets to team members for YTD to June 2026.
+          </p>
         </div>
       </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={handleTabChange}
-        className={cn("gap-5", isTeamTab && "flex min-h-0 flex-1 flex-col overflow-hidden")}
-      >
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <HeaderSummaryWidget
+          label="Org metrics"
+          value={orgTargets.length}
+          trendLabel={`${orgAchievement}% avg`}
+          trend={orgAchievement >= 60 ? "up" : "down"}
+          barValues={orgAchievementBars}
+        />
+        <HeaderSummaryWidget
+          label="Team members"
+          value={TEAM_MEMBERS.length}
+          trendLabel={`+${teamSizeDelta} YTD`}
+          trend="up"
+          sparklineData={TEAM_SIZE_TREND}
+        />
+        <HeaderSummaryWidget
+          label="Avg achievement"
+          value={`${teamSummary}%`}
+          trendLabel={`+${achievementTrendDelta} pts`}
+          trend={achievementTrendDelta >= 0 ? "up" : "down"}
+          sparklineData={LANDING_TARGET_PROGRESS_CHART}
+        />
+      </div>
+
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-5">
         <TabsList className="h-auto w-full justify-start rounded-lg bg-muted p-1">
           {TARGET_TABS.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className={tabTriggerClass}>
@@ -1083,9 +1081,9 @@ export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProp
           </div>
         </TabsContent>
 
-        <TabsContent value="team" className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden">
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
-            <aside className="flex min-h-0 min-w-0 flex-col overflow-hidden">
+        <TabsContent value="team" className="mt-0">
+          <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-start">
+            <aside className="flex flex-col lg:sticky lg:top-0 lg:max-h-[calc(100dvh-14rem)] lg:overflow-hidden">
               <div className="relative mb-3 shrink-0">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -1109,7 +1107,7 @@ export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProp
                 />
               </div>
 
-              <div className="h-0 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
                 {filteredMembers.length > 0 ? (
                   filteredMembers.map((member) => {
                     const memberEntry = memberTargets.find(
@@ -1138,10 +1136,10 @@ export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProp
               </div>
             </aside>
 
-            <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+            <section className="rounded-xl border border-border bg-card shadow-xs">
               {selectedMember && selectedMemberTargets ? (
                 <>
-                  <div className="flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-semibold text-foreground">
@@ -1166,52 +1164,48 @@ export function ManageTargetsPage({ onBack, onTabChange }: ManageTargetsPageProp
                     </Button>
                   </div>
 
-                  <div className="h-0 min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-                    <div className="flex min-h-full flex-col">
-                      <div className="space-y-3">
-                        {selectedMemberTargets.assignments.length > 0 ? (
-                          selectedMemberTargets.assignments.map((assignment) => (
-                            <MemberTargetEditor
-                              key={assignment.id}
-                              assignment={assignment}
-                              onChange={(updates) =>
-                                updateMemberAssignment(
-                                  selectedMember.id,
-                                  assignment.id,
-                                  updates
-                                )
-                              }
-                              onRemove={() =>
-                                removeMemberAssignment(selectedMember.id, assignment.id)
-                              }
-                            />
-                          ))
-                        ) : (
-                          <div className="rounded-lg border border-dashed border-border bg-muted/15 px-4 py-10 text-center">
-                            <p className="text-sm font-medium text-foreground">No targets assigned</p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Add a target metric for {selectedMember.name}.
-                            </p>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="mt-4 h-8 gap-1.5 text-xs"
-                              onClick={() => addMemberAssignment(selectedMember.id)}
-                            >
-                              <Plus className="size-3.5" />
-                              Add target
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-auto flex justify-end pt-6">
-                        <Button type="button" className="h-9 text-xs" onClick={handleSaveTeam}>
-                          Save team member target
+                  <div className="space-y-3 p-4">
+                    {selectedMemberTargets.assignments.length > 0 ? (
+                      selectedMemberTargets.assignments.map((assignment) => (
+                        <MemberTargetEditor
+                          key={assignment.id}
+                          assignment={assignment}
+                          onChange={(updates) =>
+                            updateMemberAssignment(
+                              selectedMember.id,
+                              assignment.id,
+                              updates
+                            )
+                          }
+                          onRemove={() =>
+                            removeMemberAssignment(selectedMember.id, assignment.id)
+                          }
+                        />
+                      ))
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-border bg-muted/15 px-4 py-10 text-center">
+                        <p className="text-sm font-medium text-foreground">No targets assigned</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Add a target metric for {selectedMember.name}.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-4 h-8 gap-1.5 text-xs"
+                          onClick={() => addMemberAssignment(selectedMember.id)}
+                        >
+                          <Plus className="size-3.5" />
+                          Add target
                         </Button>
                       </div>
-                    </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end border-t border-border px-4 py-4">
+                    <Button type="button" className="h-9 text-xs" onClick={handleSaveTeam}>
+                      Save team member target
+                    </Button>
                   </div>
                 </>
               ) : null}

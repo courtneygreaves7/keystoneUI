@@ -433,7 +433,6 @@ export function LandingDashboardPage({
   const bookingChart = buildBookingTrendChart(booking.total)
   const [cardOrder, setCardOrder] = useState<DashboardCardId[]>(getInitialCardOrder)
   const [homeView, setHomeView] = useState<HomeView>("dashboard")
-  const [targetsTab, setTargetsTab] = useState("organisation")
   const [targetsRefreshKey, setTargetsRefreshKey] = useState(0)
   const intelligenceRef = useRef<HTMLDivElement>(null)
   const targetsRef = useRef<HTMLDivElement>(null)
@@ -664,18 +663,13 @@ export function LandingDashboardPage({
     return (
       <ScrollResetContainer
         resetKey="manage-targets"
-        className={cn(
-          "flex h-full min-h-0 flex-col",
-          targetsTab === "team" ? "overflow-hidden" : "overflow-y-auto"
-        )}
+        className="h-full min-h-0 overflow-y-auto"
       >
         <ManageTargetsPage
           onBack={() => {
             setHomeView("dashboard")
-            setTargetsTab("organisation")
             setTargetsRefreshKey((key) => key + 1)
           }}
-          onTabChange={setTargetsTab}
         />
       </ScrollResetContainer>
     )
