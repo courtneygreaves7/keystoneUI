@@ -22,11 +22,39 @@ export const TARGETS_COMPARE_SCOPES = [
 ] as const
 
 export type TargetsComparePeriodId = (typeof TARGETS_COMPARE_PERIODS)[number]["id"]
-export type TargetsCompareScopeId = (typeof TARGETS_COMPARE_SCOPES)[number]["id"]
+export type TargetsCompareScopeId =
+  | (typeof TARGETS_COMPARE_SCOPES)[number]["id"]
+  | `member-${string}`
 
 export type TargetsCompareSide = {
   period: TargetsComparePeriodId
   scope: TargetsCompareScopeId
+}
+
+export function getTargetsCompareScopeOptions() {
+  return [
+    ...TARGETS_COMPARE_SCOPES,
+    ...TEAM_MEMBERS.map((member) => ({
+      id: `member-${member.id}` as TargetsCompareScopeId,
+      label: member.name,
+    })),
+  ]
+}
+
+function parseMemberId(scope: TargetsCompareScopeId) {
+  return scope.startsWith("member-") ? scope.slice("member-".length) : null
+}
+
+function isOrganisationScope(scope: TargetsCompareScopeId) {
+  return scope === "organisation"
+}
+
+function isTeamScope(scope: TargetsCompareScopeId) {
+  return scope === "team"
+}
+
+function isMemberScope(scope: TargetsCompareScopeId) {
+  return scope.startsWith("member-")
 }
 
 export const DEFAULT_TARGETS_COMPARE_PRIMARY: TargetsCompareSide = {
@@ -81,6 +109,45 @@ function getTeamAchievementForPeriod(
   }, 0)
 
   return Math.round(sum / assignments.length)
+}
+
+function getMemberAchievementForPeriod(
+  memberTargets: MemberTargets[],
+  memberId: string,
+  period: TargetsComparePeriodId
+) {
+  const entry = memberTargets.find((item) => item.memberId === memberId)
+  if (!entry || entry.assignments.length === 0) return 0
+
+  const scale = PERIOD_ACTUAL_SCALE[period]
+  const sum = entry.assignments.reduce((acc, assignment) => {
+    const scaledActual = assignment.actual * scale
+    return acc + getTargetAchievementPercent(scaledActual, assignment.target)
+  }, 0)
+
+  return Math.round(sum / entry.assignments.length)
+}
+
+function getAchievementForSide(
+  side: TargetsCompareSide,
+  orgTargets: LandingTarget[],
+  memberTargets: MemberTargets[]
+) {
+  if (isOrganisationScope(side.scope)) {
+    return getOverallTargetAchievement(scaleTargets(orgTargets, side.period))
+  }
+
+  if (isTeamScope(side.scope)) {
+    return getTeamAchievementForPeriod(memberTargets, side.period)
+  }
+
+  const memberId = parseMemberId(side.scope)
+  if (!memberId) return 0
+  return getMemberAchievementForPeriod(memberTargets, memberId, side.period)
+}
+
+function getMemberAssignmentCount(memberTargets: MemberTargets[], memberId: string) {
+  return memberTargets.find((entry) => entry.memberId === memberId)?.assignments.length ?? 0
 }
 
 function getMembersOnTrackPercent(
@@ -155,7 +222,17 @@ export function getTargetsPeriodLabel(period: TargetsComparePeriodId) {
 }
 
 export function getTargetsScopeLabel(scope: TargetsCompareScopeId) {
-  return TARGETS_COMPARE_SCOPES.find((entry) => entry.id === scope)?.label ?? scope
+  if (isOrganisationScope(scope)) {
+    return TARGETS_COMPARE_SCOPES.find((entry) => entry.id === scope)?.label ?? scope
+  }
+
+  if (isTeamScope(scope)) {
+    return TARGETS_COMPARE_SCOPES.find((entry) => entry.id === scope)?.label ?? scope
+  }
+
+  const memberId = parseMemberId(scope)
+  const member = TEAM_MEMBERS.find((entry) => entry.id === memberId)
+  return member?.name ?? "Team member"
 }
 
 export function formatTargetsCompareSide(side: TargetsCompareSide) {
@@ -180,7 +257,7 @@ export function buildTargetsCompareSections(
 ): CompareSection[] {
   const sections: CompareSection[] = []
 
-  if (primary.scope === "organisation" || comparison.scope === "organisation") {
+  if (isOrganisationScope(primary.scope) || isOrganisationScope(comparison.scope)) {
     const leftOrg = scaleTargets(orgTargets, primary.period)
     const rightOrg = scaleTargets(orgTargets, comparison.period)
 
@@ -206,7 +283,7 @@ export function buildTargetsCompareSections(
     })
   }
 
-  if (primary.scope === "team" || comparison.scope === "team") {
+  if (isTeamScope(primary.scope) || isTeamScope(comparison.scope)) {
     sections.push({
       title: "Team targets",
       metrics: [
@@ -248,6 +325,29 @@ export function buildTargetsCompareSections(
     })
   }
 
+  if (isMemberScope(primary.scope) || isMemberScope(comparison.scope)) {
+    const primaryMemberId = parseMemberId(primary.scope) ?? parseMemberId(comparison.scope) ?? ""
+    const comparisonMemberId = parseMemberId(comparison.scope) ?? primaryMemberId
+
+    sections.push({
+      title: "Team member targets",
+      metrics: [
+        buildAchievementMetric(
+          "Achievement",
+          getAchievementForSide(primary, orgTargets, memberTargets),
+          getAchievementForSide(comparison, orgTargets, memberTargets)
+        ),
+        buildValueMetric(
+          "Target assignments",
+          getMemberAssignmentCount(memberTargets, primaryMemberId),
+          getMemberAssignmentCount(memberTargets, comparisonMemberId),
+          String(getMemberAssignmentCount(memberTargets, primaryMemberId)),
+          String(getMemberAssignmentCount(memberTargets, comparisonMemberId))
+        ),
+      ],
+    })
+  }
+
   return sections
 }
 
@@ -257,15 +357,8 @@ export function getTargetsCompareSummary(
   orgTargets: LandingTarget[],
   memberTargets: MemberTargets[]
 ) {
-  const primaryAchievement =
-    primary.scope === "organisation"
-      ? getOverallTargetAchievement(scaleTargets(orgTargets, primary.period))
-      : getTeamAchievementForPeriod(memberTargets, primary.period)
-
-  const comparisonAchievement =
-    comparison.scope === "organisation"
-      ? getOverallTargetAchievement(scaleTargets(orgTargets, comparison.period))
-      : getTeamAchievementForPeriod(memberTargets, comparison.period)
+  const primaryAchievement = getAchievementForSide(primary, orgTargets, memberTargets)
+  const comparisonAchievement = getAchievementForSide(comparison, orgTargets, memberTargets)
 
   return {
     primaryAchievement,

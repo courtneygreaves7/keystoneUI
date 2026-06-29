@@ -29,10 +29,10 @@ import {
   DEFAULT_TARGETS_COMPARE_COMPARISON,
   DEFAULT_TARGETS_COMPARE_PRIMARY,
   formatTargetsCompareSide,
+  getTargetsCompareScopeOptions,
   getTargetsCompareSummary,
   getTargetsProgressTrend,
   TARGETS_COMPARE_PERIODS,
-  TARGETS_COMPARE_SCOPES,
   type TargetsCompareSide,
 } from "@/lib/targets-compare-data"
 import { cn } from "@/lib/utils"
@@ -81,7 +81,7 @@ function TargetsCompareFilterPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {TARGETS_COMPARE_SCOPES.map((scope) => (
+              {getTargetsCompareScopeOptions().map((scope) => (
                 <SelectItem key={scope.id} value={scope.id}>
                   {scope.label}
                 </SelectItem>

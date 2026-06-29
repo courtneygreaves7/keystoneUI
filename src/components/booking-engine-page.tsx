@@ -402,7 +402,7 @@ export function BookingEnginePage({
           </div>
         ) : null}
 
-        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
+        <div className="grid h-[min(40rem,calc(100dvh-16rem))] min-h-0 gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
           <aside className="flex min-h-0 flex-col overflow-hidden">
             <div className="relative mb-3 shrink-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
