@@ -2,7 +2,6 @@ import { TrendingDown, TrendingUp } from "lucide-react"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { WidgetHelpButton } from "@/components/widgets/widget-help-button"
-import { CHART_BAR_FILL_CLASS } from "@/lib/chart-colors"
 import { FIGURE_24PX_CLASS, METRIC_WIDGET_STACK_GAP_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
@@ -105,7 +104,7 @@ export function MetricBenchmarkWidget({
             aria-label={benchmarkLabel}
           >
             <div
-              className={cn("h-full transition-[width]", CHART_BAR_FILL_CLASS)}
+              className="h-full bg-foreground transition-[width]"
               style={{ width: `${clamped}%` }}
             />
           </div>

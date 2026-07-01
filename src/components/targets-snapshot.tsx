@@ -12,12 +12,6 @@ import {
   type LandingTarget,
 } from "@/lib/landing-targets-data"
 import { getOrgTargets } from "@/lib/targets-store"
-import {
-  CHART_AREA_GRADIENT_FROM,
-  CHART_BAR,
-  CHART_BAR_FILL_CLASS,
-  CHART_LINE,
-} from "@/lib/chart-colors"
 import { FIGURE_24PX_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
@@ -59,7 +53,7 @@ function TargetDonut({ percent }: { percent: number }) {
             stroke="none"
             isAnimationActive={false}
           >
-            <Cell fill={CHART_BAR} />
+            <Cell fill="var(--foreground)" />
             <Cell fill="var(--muted)" />
           </Pie>
         </PieChart>
@@ -95,7 +89,7 @@ function TargetBreakdownRow({ target }: { target: LandingTarget }) {
         role="presentation"
       >
         <div
-          className={cn("h-full rounded-full transition-[width]", CHART_BAR_FILL_CLASS)}
+          className="h-full rounded-full bg-foreground transition-[width]"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -123,8 +117,8 @@ function OverallProgressSlide({
           >
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.12} />
-                <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -138,7 +132,7 @@ function OverallProgressSlide({
             <Area
               type="monotone"
               dataKey="value"
-              stroke={CHART_LINE}
+              stroke="var(--foreground)"
               strokeWidth={1.5}
               strokeOpacity={0.55}
               fill={`url(#${gradientId})`}
@@ -226,7 +220,7 @@ export function TargetsSnapshot() {
             onClick={() => setSlideIndex(index)}
             className={cn(
               "size-1.5 rounded-full transition-colors",
-              index === slideIndex ? CHART_BAR_FILL_CLASS : "bg-muted-foreground/35 hover:bg-muted-foreground/55"
+              index === slideIndex ? "bg-foreground" : "bg-muted-foreground/35 hover:bg-muted-foreground/55"
             )}
             aria-label={`Show ${slide.title}`}
             aria-current={index === slideIndex ? "true" : undefined}

@@ -46,14 +46,6 @@ import {
   type MemberTargets,
 } from "@/lib/targets-store"
 import { cn } from "@/lib/utils"
-import {
-  CHART_AREA_GRADIENT_FROM,
-  CHART_BAR_FILL_CLASS,
-  CHART_BAR_FILL_SOFT_CLASS,
-  CHART_BAR_GOAL_CLASS,
-  CHART_BAR_MUTED_CLASS,
-  CHART_LINE,
-} from "@/lib/chart-colors"
 
 type ManageTargetsPageProps = {
   onBack: () => void
@@ -97,7 +89,7 @@ function TargetCompareBar({
         <div
           className={cn(
             "absolute inset-y-0 left-0 rounded-full transition-[width]",
-            variant === "goal" ? CHART_BAR_GOAL_CLASS : CHART_BAR_FILL_CLASS
+            variant === "goal" ? "bg-muted-foreground/30" : "bg-foreground"
           )}
           style={{ width: `${variant === "goal" ? 100 : clamped}%` }}
         />
@@ -136,7 +128,7 @@ function TargetAchievementVisual({ target }: { target: LandingTarget }) {
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-[width]", CHART_BAR_FILL_CLASS)}
+          className="h-full rounded-full bg-foreground transition-[width]"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -176,7 +168,7 @@ function MemberTargetProgressBar({ percent }: { percent: number }) {
   return (
     <div className="h-2.5 overflow-hidden rounded-full bg-muted">
       <div
-        className={cn("h-full rounded-full transition-[width]", CHART_BAR_FILL_CLASS)}
+        className="h-full rounded-full bg-foreground transition-[width]"
         style={{ width: `${clamped}%` }}
       />
     </div>
@@ -219,7 +211,7 @@ function OrganisationTargetCard({
         <TargetAchievementVisual target={target} />
       </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <div className="mt-3 grid gap-3 grid-cols-1">
         <Field>
           <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
             Target goal
@@ -354,14 +346,14 @@ function HeaderSummarySparkline({ data }: { data: TargetProgressPoint[] }) {
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.14} />
-              <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+              <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.14} />
+              <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
             </linearGradient>
           </defs>
           <Area
             type="monotone"
             dataKey="value"
-            stroke={CHART_LINE}
+            stroke="var(--foreground)"
             strokeWidth={1.5}
             strokeOpacity={0.55}
             fill={`url(#${gradientId})`}
@@ -388,7 +380,7 @@ function HeaderSummaryBars({ values }: { values: number[] }) {
             <div
               className={cn(
                 "w-full rounded-sm transition-[height]",
-                isLast ? CHART_BAR_FILL_SOFT_CLASS : CHART_BAR_MUTED_CLASS
+                isLast ? "bg-foreground/70" : "bg-muted"
               )}
               style={{ height: `${heightPct}%` }}
             />
@@ -657,7 +649,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
         </TabsList>
 
         <TabsContent value="organisation" className="mt-0 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-4">
             {orgTargets.map((target) => (
               <OrganisationTargetCard
                 key={target.id}

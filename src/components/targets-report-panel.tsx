@@ -36,11 +36,6 @@ import {
   getTargetAchievementPercent,
   type LandingTarget,
 } from "@/lib/landing-targets-data"
-import {
-  CHART_BAR_FILL_FADED_CLASS,
-  CHART_BAR_FILL_LIGHT_CLASS,
-  CHART_BAR_FILL_SOFT_CLASS,
-} from "@/lib/chart-colors"
 import { TEAM_MEMBERS } from "@/lib/team-data"
 import type { MemberTargets } from "@/lib/targets-store"
 import {
@@ -144,8 +139,8 @@ function ReportPreviewVisual({
 
   return (
     <div className="relative overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-muted/40 via-card to-muted/25 p-5">
-      <div className="pointer-events-none absolute -top-8 -right-8 size-28 rounded-full bg-[var(--chart-bar)]/[0.06]" />
-      <div className="pointer-events-none absolute -bottom-10 -left-6 size-24 rounded-full bg-[var(--chart-2)]/[0.08]" />
+      <div className="pointer-events-none absolute -top-8 -right-8 size-28 rounded-full bg-foreground/[0.03]" />
+      <div className="pointer-events-none absolute -bottom-10 -left-6 size-24 rounded-full bg-foreground/[0.04]" />
 
       <div className="relative mx-auto w-full max-w-[15rem]">
         <div className="rounded-lg border border-border bg-background shadow-md">
@@ -182,7 +177,7 @@ function ReportPreviewVisual({
                 </div>
                 <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-muted">
                   <div
-                    className={cn("h-full rounded-full", CHART_BAR_FILL_SOFT_CLASS)}
+                    className="h-full rounded-full bg-foreground/70"
                     style={{ width: `${achievement}%` }}
                   />
                 </div>
@@ -191,7 +186,7 @@ function ReportPreviewVisual({
                     <div key={target.id} className="flex items-center gap-1.5">
                       <div className="h-1 flex-1 rounded-full bg-muted">
                         <div
-                          className={cn("h-full rounded-full", CHART_BAR_FILL_FADED_CLASS)}
+                          className="h-full rounded-full bg-foreground/40"
                           style={{
                             width: `${getTargetAchievementPercent(target.actual, target.target)}%`,
                           }}
@@ -218,7 +213,7 @@ function ReportPreviewVisual({
                   {[42, 68, 55, 80, 61].map((height, index) => (
                     <div
                       key={index}
-                      className={cn("w-2.5 rounded-sm", CHART_BAR_FILL_LIGHT_CLASS)}
+                      className="w-2.5 rounded-sm bg-foreground/25"
                       style={{ height: `${height * 0.22}px` }}
                     />
                   ))}
@@ -243,7 +238,7 @@ function ReportPreviewVisual({
                     <div key={assignment.id} className="flex items-center gap-1.5">
                       <div className="h-1 flex-1 rounded-full bg-muted">
                         <div
-                          className={cn("h-full rounded-full", CHART_BAR_FILL_FADED_CLASS)}
+                          className="h-full rounded-full bg-foreground/40"
                           style={{
                             width: `${getTargetAchievementPercent(assignment.actual, assignment.target)}%`,
                           }}

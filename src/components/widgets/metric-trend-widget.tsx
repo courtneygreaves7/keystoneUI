@@ -12,7 +12,6 @@ import {
 } from "@/components/booking-engine/property-insight-primitives"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { WidgetHelpButton } from "@/components/widgets/widget-help-button"
-import { CHART_AREA_GRADIENT_FROM, CHART_LINE } from "@/lib/chart-colors"
 import { FIGURE_24PX_CLASS, METRIC_WIDGET_STACK_GAP_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
@@ -104,8 +103,8 @@ export function MetricTrendWidget({
                   <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.1} />
-                        <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+                        <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.1} />
+                        <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis
@@ -119,7 +118,7 @@ export function MetricTrendWidget({
                     <Area
                       type="monotone"
                       dataKey="value"
-                      stroke={CHART_LINE}
+                      stroke="var(--foreground)"
                       strokeWidth={1.75}
                       strokeOpacity={0.55}
                       fill={`url(#${gradientId})`}
@@ -181,8 +180,8 @@ export function MetricTrendWidget({
               <AreaChart data={chartData} margin={{ top: 6, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.12} />
-                    <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
+                    <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -196,7 +195,7 @@ export function MetricTrendWidget({
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke={CHART_LINE}
+                  stroke="var(--foreground)"
                   strokeWidth={2}
                   fill={`url(#${gradientId})`}
                   dot={false}

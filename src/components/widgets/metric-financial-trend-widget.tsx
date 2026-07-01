@@ -15,7 +15,6 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { MetricTrendDirection, MetricTrendPoint } from "@/components/widgets/metric-trend-widget"
 import { WidgetHelpButton } from "@/components/widgets/widget-help-button"
-import { CHART_AREA_GRADIENT_FROM, CHART_LINE, CHART_RANK_BAR_CLASSES, CHART_RANK_DOT_CLASSES } from "@/lib/chart-colors"
 import { FIGURE_24PX_CLASS } from "@/lib/figure-styles"
 import { cn } from "@/lib/utils"
 
@@ -42,6 +41,18 @@ export type MetricFinancialTrendWidgetProps = {
 }
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
+
+const MEDAL_DOT_CLASSES = [
+  "bg-amber-400",
+  "bg-slate-300 dark:bg-slate-400",
+  "bg-amber-700",
+] as const
+
+const MEDAL_BAR_CLASSES = [
+  "bg-amber-400",
+  "bg-slate-300 dark:bg-slate-400",
+  "bg-amber-700",
+] as const
 
 function TrendBadge({
   label,
@@ -111,8 +122,8 @@ export function MetricFinancialTrendWidget({
                     <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.1} />
-                          <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+                          <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.1} />
+                          <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <XAxis
@@ -126,7 +137,7 @@ export function MetricFinancialTrendWidget({
                       <Area
                         type="monotone"
                         dataKey="value"
-                        stroke={CHART_LINE}
+                        stroke="var(--foreground)"
                         strokeWidth={1.75}
                         strokeOpacity={0.55}
                         fill={`url(#${gradientId})`}
@@ -151,7 +162,7 @@ export function MetricFinancialTrendWidget({
                         key={row.label}
                         className={cn(
                           "h-full transition-[width]",
-                          CHART_RANK_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
+                          MEDAL_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
                         )}
                         style={{ width: `${row.sharePercent}%` }}
                       />
@@ -163,7 +174,7 @@ export function MetricFinancialTrendWidget({
                         <span
                           className={cn(
                             "size-2 shrink-0 rounded-full",
-                            CHART_RANK_DOT_CLASSES[index] ?? "bg-muted-foreground"
+                            MEDAL_DOT_CLASSES[index] ?? "bg-muted-foreground"
                           )}
                           aria-hidden
                         />
@@ -234,8 +245,8 @@ export function MetricFinancialTrendWidget({
             <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.12} />
-                  <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+                  <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -249,7 +260,7 @@ export function MetricFinancialTrendWidget({
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke={CHART_LINE}
+                stroke="var(--foreground)"
                 strokeWidth={2}
                 fill={`url(#${gradientId})`}
                 dot={false}
@@ -273,7 +284,7 @@ export function MetricFinancialTrendWidget({
                 key={row.label}
                 className={cn(
                   "h-full transition-[width]",
-                  CHART_RANK_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
+                  MEDAL_BAR_CLASSES[index] ?? "bg-muted-foreground/20"
                 )}
                 style={{ width: `${row.sharePercent}%` }}
               />
@@ -287,7 +298,7 @@ export function MetricFinancialTrendWidget({
                   <span
                     className={cn(
                       "size-2 shrink-0 rounded-full",
-                      CHART_RANK_DOT_CLASSES[index] ?? "bg-muted-foreground"
+                      MEDAL_DOT_CLASSES[index] ?? "bg-muted-foreground"
                     )}
                     aria-hidden
                   />

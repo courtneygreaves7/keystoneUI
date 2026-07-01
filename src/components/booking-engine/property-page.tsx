@@ -30,7 +30,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { CHART_AREA_GRADIENT_FROM, CHART_BAR, CHART_LINE } from "@/lib/chart-colors"
 import { formatBrandLabel } from "@/lib/booking-engine-data"
 import { metricCardGridClass } from "@/lib/card-layout"
 import { PROPERTY_BOOKINGS_INSIGHT, PROPERTY_OCCUPANCY, PROPERTY_AVG_NIGHTS } from "@/lib/property-insights-data"
@@ -181,7 +180,7 @@ function HeaderMetricChart({
         <BarChart data={data} margin={chartMargin}>
           <Bar
             dataKey="value"
-            fill={CHART_BAR}
+            fill="var(--foreground)"
             fillOpacity={0.32}
             radius={[5, 5, 0, 0]}
             maxBarSize={10}
@@ -199,7 +198,7 @@ function HeaderMetricChart({
           <Line
             type="monotone"
             dataKey="value"
-            stroke={CHART_LINE}
+            stroke="var(--foreground)"
             strokeOpacity={0.55}
             strokeWidth={2}
             dot={false}
@@ -215,8 +214,8 @@ function HeaderMetricChart({
       <AreaChart data={data} margin={chartMargin}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0.12} />
-            <stop offset="100%" stopColor={CHART_AREA_GRADIENT_FROM} stopOpacity={0} />
+            <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
+            <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <Area
